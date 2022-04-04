@@ -1757,9 +1757,8 @@ contract ERC721Upgradeable is
     //EndDate
     uint256 internal _endDate;
 
-    //NullAddress
-    address internal nullAddress = 0x0000000000000000000000000000000000000000;
-
+    //WhiteList
+    bool public whiteList;
     /*
      *     bytes4(keccak256('balanceOf(address)')) == 0x70a08231
      *     bytes4(keccak256('ownerOf(uint256)')) == 0x6352211e
@@ -1795,7 +1794,7 @@ contract ERC721Upgradeable is
     bytes4 private constant _INTERFACE_ID_ERC721_ENUMERABLE = 0x780e9d63;
 
     event WhiteList(
-        address[] whiteListedAddress,
+        address whiteListedAddress,
         bool status
     );
 
@@ -1808,14 +1807,14 @@ contract ERC721Upgradeable is
         uint256 supply_,
         uint256 startDate_,
         uint256 endDate_,
-        address[] memory whitelisted_
+        bool whiteList_
     ) internal initializer {
         __Context_init_unchained();
         __ERC165_init_unchained();
         __ERC721_init_unchained(name_, symbol_);
         _updateSupply(supply_);
         _setTime(startDate_, endDate_);
-        _updateWhiteListed(whitelisted_);
+        whiteList = whiteList_;
     }
 
     function _updateSupply(uint256 supply_) internal {
@@ -1833,14 +1832,6 @@ contract ERC721Upgradeable is
         _registerInterface(_INTERFACE_ID_ERC721);
         _registerInterface(_INTERFACE_ID_ERC721_METADATA);
         _registerInterface(_INTERFACE_ID_ERC721_ENUMERABLE);
-    }
-
-    function _updateWhiteListed(address[] memory whitelisted_) internal 
-    {
-        for(uint256 i=0; i<whitelisted_.length; i++) {
-            whiteListedAddress[whitelisted_[i]] = true;
-        }
-        emit WhiteList(whitelisted_,true);
     }
 
     function _setTime(uint256 startDate_, uint256 endDate_) internal 
@@ -2788,10 +2779,9 @@ abstract contract NFT721Mint is
     TreasuryNode
 {
     uint256 private nextTokenId;
-    address[] whitelist;
     mapping(address => bool) public tokenAddress;
-    mapping(address => uint256) public feesAmount;
-    mapping(address => uint256) public updateFee;
+    mapping(address => uint256) public mintFees;
+    mapping(address => uint256) public updateUriFees;
 
     event Minted(
         address indexed creator,
@@ -2802,7 +2792,11 @@ abstract contract NFT721Mint is
 
     event TokenUpdated(
         address indexed tokenAddress,
-        bool status,
+        bool status
+    );
+
+    event TokenFeesUpdated(
+        address indexed tokenAddress,
         uint256 mintFee,
         uint256 uriUpdateFee
     );
@@ -2814,13 +2808,10 @@ abstract contract NFT721Mint is
         string tokenIPFSPath
     );
 
-    /**
-     * @dev Modifier to protect an initializer function from being invoked twice.
-     */
 
     modifier onlyWhitelistedUsers() {
         require(
-            whiteListedAddress[msg.sender]==true || whiteListedAddress[nullAddress] == true,
+            whiteListedAddress[msg.sender]==true || whiteList == true,
             "NFT721Mint:MINT_ADDRESS_NOT_AUTHORIZED"
         );
         _;
@@ -2848,7 +2839,7 @@ abstract contract NFT721Mint is
      * @notice Allows a creator to mint an NFT.
      */
     function mint(string memory tokenIPFSPath,
-    address paymentMode)
+    address paymentToken)
         public payable
         onlyWhitelistedUsers
         returns (uint256 tokenId)
@@ -2862,18 +2853,18 @@ abstract contract NFT721Mint is
         }
         require(_startDate <= block.timestamp && block.timestamp <= _endDate, "NFT721Mint:MINTING_NOT_LIVE");
         require(
-            tokenAddress[paymentMode] == true,
+            tokenAddress[paymentToken] == true,
             "NFT721Mint:INVALID_PAYMENT_MODE"
         );
-        if (paymentMode != address(0)) {
-            IERC20(paymentMode).transferFrom(
+        if (paymentToken != address(0)) {
+            IERC20(paymentToken).transferFrom(
                 msg.sender,
                 getDropsTreasury(),
-                feesAmount[paymentMode]
+                mintFees[paymentToken]
             );
         } else {
             require(
-                msg.value >= feesAmount[paymentMode],
+                msg.value >= mintFees[paymentToken],
                 "NFT721Mint:INSUFFICIENT_FEE_AMOUNT"
             );
             getDropsTreasury().transfer(address(this).balance);
@@ -2891,28 +2882,27 @@ abstract contract NFT721Mint is
     function updateTokenURI(
         uint256 tokenId,
         string memory tokenIPFSPath,
-        address paymentMode
+        address paymentToken
     ) 
         public payable
         onlyWhitelistedUsers
     {
         address owner = ownerOf(tokenId);
         require(msg.sender == owner, "NFT721Mint:NOT_AUTHORIZED");
-        require(block.timestamp <= _endDate, "NFT721Mint:MINTING_NOT_LIVE");
         require(
-            tokenAddress[paymentMode] == true,
+            tokenAddress[paymentToken] == true,
             "NFT721Mint:INVALID_PAYMENT_MODE"
         );
         
-        if (paymentMode != address(0)) {
-            IERC20(paymentMode).transferFrom(
+        if (paymentToken != address(0)) {
+            IERC20(paymentToken).transferFrom(
                 msg.sender,
                 getDropsTreasury(),
-                updateFee[paymentMode]
+                updateUriFees[paymentToken]
             );
         } else {
             require(
-                msg.value >= updateFee[paymentMode],
+                msg.value >= updateUriFees[paymentToken],
                 "NFT721Mint:INSUFFICIENT_FEE_AMOUNT"
             );
             getDropsTreasury().transfer(address(this).balance);
@@ -2979,7 +2969,7 @@ contract DropsCollection is
         uint256 supply,
         uint256 startDate,
         uint256 endDate,
-        address[] memory whitelisted
+        bool whitelisted
     ) public initializer {
         //require(msg.sender == dropMaster, "DropsCollection:ADDRESS_NOT_AUTHORIZED");
         dropMaster = _dropMaster;
@@ -3015,14 +3005,30 @@ contract DropsCollection is
      */
     function adminUpdateToken(
         address _tokenAddress,
-        bool status,
+        bool status
+    ) public onlyAdmin {
+        tokenAddress[_tokenAddress] = status;
+        emit TokenUpdated(_tokenAddress, status);
+    }
+
+    function adminUpdateFees(
+        address _tokenAddress,
         uint256 _mintFee,
         uint256 _updateFee
     ) public onlyAdmin {
-        tokenAddress[_tokenAddress] = status;
-        feesAmount[_tokenAddress] = _mintFee;
-        updateFee[_tokenAddress] = _updateFee;
-        emit TokenUpdated(_tokenAddress, status, _mintFee, _updateFee);
+        require(tokenAddress[_tokenAddress]== true, "DropsCollection:INVALID_PAYMENT_TOKEN");
+        mintFees[_tokenAddress] = _mintFee;
+        updateUriFees[_tokenAddress] = _updateFee;
+
+        emit TokenFeesUpdated(_tokenAddress, _mintFee, _updateFee);
+    }
+
+    function updateWhiteList(address[] memory _whiteListedAddress, bool[] memory status) public onlyAdmin {
+        require(whiteList == false, "DropsCollection:PUBLIC_COLLECTION");
+        for(uint256 i=0; i<_whiteListedAddress.length; i++) {
+            whiteListedAddress[_whiteListedAddress[i]]=status[i];
+            emit WhiteList(_whiteListedAddress[i], status[i]);
+        }
     }
 
     function changeAdmin(address _newAdmin) external onlyAdmin {
