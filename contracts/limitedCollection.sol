@@ -122,7 +122,6 @@ interface IERC20 {
     );
 }
 
-
 // File @openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol@v3.4.1-solc-0.7
 
 pragma solidity ^0.7.0;
@@ -1063,7 +1062,6 @@ abstract contract Ownable is ContextUpgradeable {
     }
 }
 
-
 // File @openzeppelin/contracts-upgradeable/utils/EnumerableSetUpgradeable.sol@v3.4.1-solc-0.7
 
 pragma solidity ^0.7.0;
@@ -1875,10 +1873,7 @@ contract ERC721Upgradeable is
      */
     bytes4 private constant _INTERFACE_ID_ERC721_ENUMERABLE = 0x780e9d63;
 
-    event WhiteList(
-        address whiteListedAddress,
-        bool status
-    );
+    event WhiteList(address whiteListedAddress, bool status);
 
     /**
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
@@ -1916,8 +1911,7 @@ contract ERC721Upgradeable is
         _registerInterface(_INTERFACE_ID_ERC721_ENUMERABLE);
     }
 
-    function _setTime(uint256 startDate_, uint256 endDate_) internal 
-    {
+    function _setTime(uint256 startDate_, uint256 endDate_) internal {
         _startDate = startDate_;
         _endDate = endDate_;
     }
@@ -1962,16 +1956,17 @@ contract ERC721Upgradeable is
     /**
      * Returns startDate of minting process
      */
-    function startDate() public view returns(uint256) {
+    function startDate() public view returns (uint256) {
         return _startDate;
     }
 
     /**
      * Returns endDate of minting process
      */
-    function endDate() public view returns(uint256) {
+    function endDate() public view returns (uint256) {
         return _endDate;
     }
+
     /**
      * @dev See {IERC721Metadata-tokenURI}.
      */
@@ -2707,7 +2702,6 @@ abstract contract NFT721Creator is Initializable, ERC721Upgradeable {
      */
     bytes4 private constant _INTERFACE_TOKEN_CREATOR = 0x40c1a064;
 
-
     modifier onlyCreatorAndOwner(uint256 tokenId) {
         require(
             tokenIdToCreator[tokenId] == msg.sender,
@@ -2726,7 +2720,6 @@ abstract contract NFT721Creator is Initializable, ERC721Upgradeable {
     function _initializeNFT721Creator() internal initializer {
         _registerInterface(_INTERFACE_TOKEN_CREATOR);
     }
-
 
     /**
      * @notice Returns the creator's address for a given tokenId.
@@ -2779,6 +2772,7 @@ abstract contract NFT721Metadata is NFT721Creator {
         string indexed indexedTokenIPFSPath,
         string tokenIPFSPath
     );
+
     // This event was used in an order version of the contract
     //event NFTMetadataUpdated(string name, string symbol, string baseURI);
 
@@ -2852,19 +2846,13 @@ abstract contract NFT721Mint is
         string tokenIPFSPath
     );
 
-    event TokenUpdated(
-        address indexed tokenAddress,
-        bool status
-    );
+    event TokenUpdated(address indexed tokenAddress, bool status);
 
-    event TokenFeesUpdated(
-        address indexed tokenAddress,
-        uint256 mintFee
-    );
+    event TokenFeesUpdated(address indexed tokenAddress, uint256 mintFee);
 
     modifier onlyWhitelistedUsers() {
         require(
-            whiteListedAddress[msg.sender]==true || whiteList == false,
+            whiteListedAddress[msg.sender] == true || whiteList == false,
             "NFT721Mint : MINT_ADDRESS_NOT_AUTHORIZED"
         );
         _;
@@ -2872,10 +2860,7 @@ abstract contract NFT721Mint is
 
     function _supplyCheck(uint256 tokenId) internal view {
         if (_supply != 0) {
-            require(
-                tokenId <= _supply,
-                "NFT721Mint : MINT_LIMIT_REACHED"
-            );
+            require(tokenId <= _supply, "NFT721Mint : MINT_LIMIT_REACHED");
         }
     }
 
@@ -2900,8 +2885,10 @@ abstract contract NFT721Mint is
     }
 
     function _dateCheck() internal view {
-        require(_startDate <= block.timestamp && block.timestamp <= _endDate, "NFT721Mint : MINTING_NOT_LIVE");
-
+        require(
+            _startDate <= block.timestamp && block.timestamp <= _endDate,
+            "NFT721Mint : MINTING_NOT_LIVE"
+        );
     }
 
     /**
@@ -2914,10 +2901,7 @@ abstract contract NFT721Mint is
     /**
      * @dev Called once after the initial deployment to set the initial tokenId.
      */
-    function _initializeNFT721Mint()
-        internal
-        initializer
-    {
+    function _initializeNFT721Mint() internal initializer {
         // Use ID 1 for the first NFT tokenId
         nextTokenId = 1;
     }
@@ -2925,13 +2909,12 @@ abstract contract NFT721Mint is
     /**
      * @notice Allows a creator to mint an NFT.
      */
-    function mint(string memory tokenIPFSPath,
-    address paymentToken)
-        public payable
+    function mint(string memory tokenIPFSPath, address paymentToken)
+        public
+        payable
         onlyWhitelistedUsers
         returns (uint256 tokenId)
     {
-
         tokenId = nextTokenId++;
         _supplyCheck(tokenId);
         _dateCheck();
@@ -2940,7 +2923,7 @@ abstract contract NFT721Mint is
         _updateTokenCreator(tokenId, msg.sender);
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
         emit Minted(msg.sender, tokenId, tokenIPFSPath, tokenIPFSPath);
-    } 
+    }
 
     uint256[1000] private ______gap;
 }
@@ -2953,7 +2936,7 @@ pragma solidity ^0.7.0;
  * @title Drop NFTs implemented using the ERC-721 standard.
  * @dev This top level file holds no data directly to ease future upgrades.
  */
-contract DropsCollection is 
+contract DropsCollection is
     ERC165Upgradeable,
     ERC721Upgradeable,
     NFT721Creator,
@@ -2962,8 +2945,7 @@ contract DropsCollection is
     NFT721Core,
     NFT721Mint,
     Ownable
-    
-{   
+{
     /**
      * @notice Called once to configure the contract after the initial deployment.
      * @dev This farms the initialize call out to inherited contracts as needed.
@@ -2981,26 +2963,31 @@ contract DropsCollection is
         NFT721Creator._initializeNFT721Creator(); // leave
         NFT721Mint._initializeNFT721Mint();
         TreasuryNode._initializeTreasuryNode(treasury);
-        ERC721Upgradeable.__ERC721_init(name, symbol, supply, startDate, endDate, whitelisted);
+        ERC721Upgradeable.__ERC721_init(
+            name,
+            symbol,
+            supply,
+            startDate,
+            endDate,
+            whitelisted
+        );
     }
 
     /**
      * @notice Allows a Drop admin to update NFT config variables.
      * @dev This must be called right after the initial call to `initialize`.
      */
-    function adminUpdateConfig(string memory baseURI)
-        public onlyOwner
-    {
+    function adminUpdateConfig(string memory baseURI) public onlyOwner {
         _updateBaseURI(baseURI);
     }
 
-     /**
+    /**
      * @notice Allows Admin to add token address.
      */
-    function adminUpdateToken(
-        address _tokenAddress,
-        bool status
-    ) public onlyOwner {
+    function adminUpdateToken(address _tokenAddress, bool status)
+        public
+        onlyOwner
+    {
         tokenAddress[_tokenAddress] = status;
         emit TokenUpdated(_tokenAddress, status);
     }
@@ -3009,11 +2996,14 @@ contract DropsCollection is
      * @notice Allows Admin to add fees for token address.
      */
 
-    function adminUpdateFees(
-        address _tokenAddress,
-        uint256 _mintFee
-    ) public onlyOwner {
-        require(tokenAddress[_tokenAddress]== true, "DropsCollection : INVALID_PAYMENT_TOKEN");
+    function adminUpdateFees(address _tokenAddress, uint256 _mintFee)
+        public
+        onlyOwner
+    {
+        require(
+            tokenAddress[_tokenAddress] == true,
+            "DropsCollection : INVALID_PAYMENT_TOKEN"
+        );
         mintFees[_tokenAddress] = _mintFee;
         emit TokenFeesUpdated(_tokenAddress, _mintFee);
     }
@@ -3022,10 +3012,13 @@ contract DropsCollection is
      * @notice Allows Admin to add or remove address.
      */
 
-    function updateWhiteList(address[] memory _whiteListedAddress, bool[] memory status) public onlyOwner {
+    function updateWhiteList(
+        address[] memory _whiteListedAddress,
+        bool[] memory status
+    ) public onlyOwner {
         require(whiteList == true, "DropsCollection : PUBLIC_COLLECTION");
-        for(uint256 i=0; i<_whiteListedAddress.length; i++) {
-            whiteListedAddress[_whiteListedAddress[i]]=status[i];
+        for (uint256 i = 0; i < _whiteListedAddress.length; i++) {
+            whiteListedAddress[_whiteListedAddress[i]] = status[i];
             emit WhiteList(_whiteListedAddress[i], status[i]);
         }
     }
