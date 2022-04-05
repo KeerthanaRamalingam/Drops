@@ -2754,15 +2754,6 @@ abstract contract NFT721Creator is Initializable, ERC721Upgradeable {
         _burn(tokenId);
     }
 
-    /**
-     * @dev Remove the creator record when burned.
-     */
-    function _burn(uint256 tokenId) internal virtual override {
-        delete tokenIdToCreator[tokenId];
-
-        super._burn(tokenId);
-    }
-
     uint256[999] private ______gap;
 }
 
@@ -2831,14 +2822,6 @@ abstract contract NFT721Metadata is NFT721Creator {
 
         creatorToIPFSHashToMinted[msg.sender][_tokenIPFSPath] = true;
         _setTokenURI(tokenId, _tokenIPFSPath);
-    }
-
-    /**
-     * @dev When a token is burned, remove record of it allowing that creator to re-mint the same NFT again in the future.
-     */
-    function _burn(uint256 tokenId) internal virtual override {
-        delete creatorToIPFSHashToMinted[msg.sender][_tokenURIs[tokenId]];
-        super._burn(tokenId);
     }
 
     uint256[999] private ______gap;
@@ -2946,17 +2929,6 @@ abstract contract NFT721Mint is
         emit Minted(msg.sender, tokenId, tokenIPFSPath, tokenIPFSPath);
     } 
 
-    /**
-     * @dev Explicit override to address compile errors.
-     */
-    function _burn(uint256 tokenId)
-        internal
-        virtual
-        override(ERC721Upgradeable, NFT721Creator, NFT721Metadata)
-    {
-        super._burn(tokenId);
-    }
-
     uint256[1000] private ______gap;
 }
 
@@ -3009,17 +2981,6 @@ contract DropsCollection is
         _updateBaseURI(baseURI);
     }
 
-    /**
-     * @dev This is a no-op, just an explicit override to address compile errors due to inheritance.
-     */
-    function _burn(uint256 tokenId)
-        internal
-        virtual
-        override(ERC721Upgradeable, NFT721Creator, NFT721Metadata, NFT721Mint)
-    {
-        super._burn(tokenId);
-    }
-
      /**
      * @notice Allows Admin to add token address.
      */
@@ -3031,6 +2992,10 @@ contract DropsCollection is
         emit TokenUpdated(_tokenAddress, status);
     }
 
+    /**
+     * @notice Allows Admin to add fees for token address.
+     */
+
     function adminUpdateFees(
         address _tokenAddress,
         uint256 _mintFee
@@ -3039,6 +3004,10 @@ contract DropsCollection is
         mintFees[_tokenAddress] = _mintFee;
         emit TokenFeesUpdated(_tokenAddress, _mintFee);
     }
+
+    /**
+     * @notice Allows Admin to add or remove address.
+     */
 
     function updateWhiteList(address[] memory _whiteListedAddress, bool[] memory status) public onlyOwner {
         require(whiteList == false, "DropsCollection : PUBLIC_COLLECTION");

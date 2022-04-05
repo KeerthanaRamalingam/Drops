@@ -57,6 +57,10 @@ contract DropMaster is
         bool whiteListed
     );
 
+    /**
+     * @notice Allows admin to create a collection.
+     */
+
     function createCollection(
         string memory _colCode,
         string memory _colName,
@@ -114,7 +118,9 @@ contract DropMaster is
         );
     }
 
-
+    /**
+     * @notice Returns the collection details.
+     */
     function getCollectionDetails(address user, string memory _code)
         public
         view
