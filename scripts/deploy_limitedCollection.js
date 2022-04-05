@@ -2,11 +2,11 @@ const { ethers } = require("hardhat")
 
 async function main() {
     const accounts = await ethers.provider.listAccounts();
-    console.log(accounts);
+    console.log("Accounts", accounts[0]);
     const dropsTreasury = await ethers.getContractFactory("Treasury");
-    const treasuryProxy = await upgrades.deployProxy(dropsTreasury, ["0xdC4A5fC7A3C2dd304F7B44a7954fD4E5cB64c076"], { initializer: 'initialize' })
+    const treasuryProxy = await upgrades.deployProxy(dropsTreasury, [accounts[0]], { initializer: 'initialize' })
     console.log("Treasury proxy", treasuryProxy.address);
-    console.log("Is admin", await treasuryProxy.isAdmin("0xdC4A5fC7A3C2dd304F7B44a7954fD4E5cB64c076"));
+    console.log("Is admin", await treasuryProxy.isAdmin(accounts[0]));
 
     //// **************************/////
 
@@ -17,9 +17,12 @@ async function main() {
     const LimitedCollection = await ethers.getContractFactory("LCMaster")
     const LimitedCollectionProxy = await upgrades.deployProxy(LimitedCollection, [treasuryProxy.address], { initializer: 'initialize' });
     console.log("LimitedCollectionProxy Proxy:", LimitedCollectionProxy.address);
-    await LimitedCollectionProxy.createCollection("DROPS", "DROPS", 20, startTime, endTime, true);
+    await LimitedCollectionProxy.createCollection("DROPS", "DROPS", 20, startTime, endTime, true, accounts[0]);
     await new Promise(res => setTimeout(res, 5000));
-    console.log("New collection", await LimitedCollectionProxy.getCollection(accounts[0], "DROPS"));
+    const Collection = await LimitedCollectionProxy.getCollection(accounts[0], "DROPS");
+    const collection = await ethers.getContractFactory('LimitedCollection');
+    const collectionInstance = await collection.attach(Collection);
+    console.log("Owner", await collectionInstance.owner());
 
 }
 
