@@ -1,22 +1,25 @@
 const { ethers } = require("hardhat")
 
 async function main() {
-    const dropsTreasury = await ethers.getContractFactory("dropsTreasury");
-    const treasuryProxy = await upgrades.deployProxy(dropsTreasury, ["0xdC4A5fC7A3C2dd304F7B44a7954fD4E5cB64c076"],{ initializer: 'initialize' })
+    const accounts = await ethers.provider.listAccounts();
+    console.log(accounts);
+    const dropsTreasury = await ethers.getContractFactory("Treasury");
+    const treasuryProxy = await upgrades.deployProxy(dropsTreasury, ["0xdC4A5fC7A3C2dd304F7B44a7954fD4E5cB64c076"], { initializer: 'initialize' })
     console.log("Treasury proxy", treasuryProxy.address);
     console.log("Is admin", await treasuryProxy.isAdmin("0xdC4A5fC7A3C2dd304F7B44a7954fD4E5cB64c076"));
 
     //// **************************/////
 
-    
+    const startTime = await ethers.provider.getBlockNumber();
+    const sevenDays = 7 * 24 * 60 * 60;
+    const endTime = startTime + sevenDays;
 
-    const limitedCollection = await ethers.getContractFactory("limitedCollection")
-    const limitedCollectionProxy = await upgrades.deployProxy(limitedCollection, [treasuryProxy.address, "0xdC4A5fC7A3C2dd304F7B44a7954fD4E5cB64c076", "DROPS", "DROPS",20,1649066064,1649238864],{ initializer: 'initialize' })
-    console.log("limitedCollectionProxy Proxy:", limitedCollectionProxy.address)
-    
-    const perpetualCollection = await ethers.getContractFactory("perpetualCollection")
-    const perpetualCollectionProxy = await upgrades.deployProxy(perpetualCollection, [treasuryProxy.address, "0xdC4A5fC7A3C2dd304F7B44a7954fD4E5cB64c076", "DROPS", "DROPS",20,1649066064,0],{ initializer: 'initialize' })
-    console.log("limitedCollectionProxy Proxy:", perpetualCollectionProxy.address)
+    const LimitedCollection = await ethers.getContractFactory("LCMaster")
+    const LimitedCollectionProxy = await upgrades.deployProxy(LimitedCollection, [treasuryProxy.address], { initializer: 'initialize' });
+    console.log("LimitedCollectionProxy Proxy:", LimitedCollectionProxy.address);
+    await LimitedCollectionProxy.createCollection("DROPS", "DROPS", 20, startTime, endTime, true);
+    await new Promise(res => setTimeout(res, 5000));
+    console.log("New collection", await LimitedCollectionProxy.getCollection(accounts[0], "DROPS"));
 
 }
 

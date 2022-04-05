@@ -74,7 +74,7 @@ module.exports = {
         },
       },
       {
-        version: "0.7.6",
+        version: "0.7.0",
         settings: {
           optimizer: {
             enabled: true,
@@ -83,6 +83,10 @@ module.exports = {
         },
       },
     ],
-    
+    overrides: {
+      "contracts/limitedCollection.sol": {
+        version: "0.7.0",
+      }
+    }
   }
-};
+}

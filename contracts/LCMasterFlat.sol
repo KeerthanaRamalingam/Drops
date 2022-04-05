@@ -1,3 +1,4 @@
+
 // SPDX-License-Identifier: UNLICENSED
 // File: contracts/Collection.sol
 
@@ -3010,7 +3011,7 @@ contract LimitedCollection is
     {
         require(
             tokenAddress[_tokenAddress] == true,
-            "DropsCollection : INVALID_PAYMENT_TOKEN"
+            "LimitedCollection : INVALID_PAYMENT_TOKEN"
         );
         mintFees[_tokenAddress] = _mintFee;
         emit TokenFeesUpdated(_tokenAddress, _mintFee);
@@ -3024,10 +3025,135 @@ contract LimitedCollection is
         address[] memory _whitelistAddresses,
         bool[] memory status
     ) public onlyOwner {
-        require(whiteList == true, "DropsCollection : PUBLIC_COLLECTION");
+        require(whiteList == true, "LimitedCollection : PUBLIC_COLLECTION");
         for (uint256 i = 0; i < _whitelistAddresses.length; i++) {
             whiteListedAddress[_whitelistAddresses[i]] = status[i];
             emit WhiteList(_whitelistAddresses[i], status[i]);
         }
+    }
+}
+
+pragma solidity ^0.7.0;
+
+// pragma experimental ABIEncoderV2;
+
+contract LCMaster is Initializable, Ownable {
+    address payable treasury;
+
+    struct collectionInfo {
+        // the collection name
+        string name;
+        // the collection symbol
+        string symbol;
+        // the collection quantity
+        uint256 quantity;
+        // the collection startDate
+        uint256 startDate;
+        // the collection endDate
+        uint256 endDate;
+        //whiteList status
+        bool whitelist;
+        // the contract address
+        address myContract;
+    }
+
+    /**
+     * @notice Called once to configure the contract after the initial deployment.
+     * @dev This farms the initialize call out to inherited contracts as needed.
+     */
+    function initialize(address payable _treasury) public initializer {
+        Ownable.ownable_init();
+        treasury = _treasury;
+    }
+
+    // collection info mapping
+    mapping(address => mapping(string => collectionInfo)) public collections;
+    // get collection
+    mapping(address => mapping(string => address)) public getCollection;
+    // get collection code with address
+    mapping(address => string) public getCode;
+
+    event CollectionCreated(
+        address creator,
+        string colCode,
+        string colName,
+        address myContract,
+        uint256 quantity,
+        uint256 startDate,
+        uint256 endDate,
+        bool whitelisted
+    );
+
+    /**
+     * @notice Allows admin to create a collection.
+     */
+    function createCollection(
+        string memory _colCode,
+        string memory _colName,
+        uint256 _colQuantity,
+        uint256 _startDate,
+        uint256 _endDate,
+        bool _whitelist
+    ) external onlyOwner returns (address collection) {
+        require(
+            getCollection[msg.sender][_colCode] == address(0),
+            "DropMaster : COLLECTION_EXISTS"
+        );
+
+        bytes memory bytecode = type(LimitedCollection).creationCode;
+        bytes32 salt = keccak256(abi.encodePacked(msg.sender, _colCode));
+
+        assembly {
+            collection := create2(0, add(bytecode, 32), mload(bytecode), salt)
+        }
+
+        getCollection[msg.sender][_colCode] = collection;
+        getCode[collection] = _colCode;
+        LimitedCollection(collection).initialize(
+            treasury,
+            _colName,
+            _colCode,
+            _colQuantity,
+            _startDate,
+            _endDate,
+            _whitelist
+        );
+        LimitedCollection(collection).adminUpdateBaseURI("https://ipfs.io/ipfs/");
+        collections[msg.sender][_colCode] = collectionInfo({
+            name: _colName,
+            symbol: _colCode,
+            quantity: _colQuantity,
+            startDate: _startDate,
+            endDate: _endDate,
+            whitelist: _whitelist,
+            myContract: collection
+        });
+
+        emit CollectionCreated(
+            msg.sender,
+            _colCode,
+            _colName,
+            collection,
+            _colQuantity,
+            _startDate,
+            _endDate,
+            _whitelist
+        );
+    }
+
+    /**
+     * @notice Returns the collection details.
+     */
+    function getCollectionDetails(address user, string memory _code)
+        public
+        view
+        returns (
+            string memory,
+            string memory,
+            uint256
+        )
+    {
+        collectionInfo memory collection = collections[user][_code];
+        return (collection.name, collection.symbol, collection.quantity);
     }
 }

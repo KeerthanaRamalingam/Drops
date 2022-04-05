@@ -1024,51 +1024,6 @@ abstract contract WithdrawFromEscrow is AdminRole {
 
 // File: contracts/Treasury.sol
 
-/*                                                                               
-  ･
-   *　★ 
-      ･ ｡
-        　･　ﾟ☆ ｡
-  　　　 *　★ ﾟ･｡ *  ｡
-          　　* ☆ ｡･ﾟ*.｡
-      　　　ﾟ *.｡☆｡★　･
-    *　　ﾟ｡·*･｡ ﾟ*
-  　　　☆ﾟ･｡°*. ﾟ
-　 ･ ﾟ*｡･ﾟ★｡
-　　･ *ﾟ｡　　 *
-　･ﾟ*｡★･
- ☆∴｡　* 
-　　　 *　★   ｡
-                      `                     .-:::::-.`              `-::---...```                   
-                     `-:`               .:+ssssoooo++//:.`       .-/+shhhhhhhhhhhhhyyyssooo:        
-                    .--::.            .+ossso+/////++/:://-`   .////+shhhhhhhhhhhhhhhhhhhhhy        
-                  `-----::.         `/+////+++///+++/:--:/+/-  -////+shhhhhhhhhhhhhhhhhhhhhy        
-                 `------:::-`      `//-.``.-/+ooosso+:-.-/oso- -////+shhhhhhhhhhhhhhhhhhhhhy        
-                .--------:::-`     :+:.`  .-/osyyyyyyso++syhyo.-////+shhhhhhhhhhhhhhhhhhhhhy        
-              `-----------:::-.    +o+:-.-:/oyhhhhhhdhhhhhdddy:-////+shhhhhhhhhhhhhhhhhhhhhy        
-             .------------::::--  `oys+/::/+shhhhhhhdddddddddy/-////+shhhhhhhhhhhhhhhhhhhhhy        
-            .--------------:::::-` +ys+////+yhhhhhhhddddddddhy:-////+yhhhhhhhhhhhhhhhhhhhhhy        
-          `----------------::::::-`.ss+/:::+oyhhhhhhhhhhhhhhho`-////+shhhhhhhhhhhhhhhhhhhhhy        
-         .------------------:::::::.-so//::/+osyyyhhhhhhhhhys` -////+shhhhhhhhhhhhhhhhhhhhhy        
-       `.-------------------::/:::::..+o+////+oosssyyyyyyys+`  .////+shhhhhhhhhhhhhhhhhhhhhy        
-       .--------------------::/:::.`   -+o++++++oooosssss/.     `-//+shhhhhhhhhhhhhhhhhhhhyo        
-     .-------   ``````.......--`        `-/+ooooosso+/-`          `./++++///:::--...``hhhhyo            
-                                              `````       
-   *　 
-      ･ ｡
-　　　　･　　ﾟ☆ ｡
-  　　　 *　★ ﾟ･｡ *  ｡
-          　　* ☆ ｡･ﾟ*.｡
-      　　　ﾟ *.｡☆｡★　･
-    *　　ﾟ｡·*･｡ ﾟ*
-  　　　☆ﾟ･｡°*. ﾟ
-　 ･ ﾟ*｡･ﾟ★｡
-　　･ *ﾟ｡　　 *
-　･ﾟ*｡★･
- ☆∴｡　*
-･ ｡
-*/
-
 pragma solidity ^0.7.0;
 
 /**
