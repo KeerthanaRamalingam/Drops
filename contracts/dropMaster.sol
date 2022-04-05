@@ -5,10 +5,7 @@ import "./limitedCollection.sol";
 pragma solidity 0.7.6;
 pragma experimental ABIEncoderV2;
 
-
-contract DropMaster is 
-    Initializable,
-    Ownable  {
+contract DropMaster is Initializable, Ownable {
     address payable treasury;
 
     struct collectionInfo {
@@ -32,13 +29,10 @@ contract DropMaster is
      * @notice Called once to configure the contract after the initial deployment.
      * @dev This farms the initialize call out to inherited contracts as needed.
      */
-    function initialize(
-        address payable _treasury
-    ) public initializer {
+    function initialize(address payable _treasury) public initializer {
         Ownable.ownable_init();
         treasury = _treasury;
     }
-
 
     // collection info mapping
     mapping(address => mapping(string => collectionInfo)) public collections;
@@ -68,10 +62,7 @@ contract DropMaster is
         uint256 _startDate,
         uint256 _endDate,
         bool _whiteList
-    ) onlyOwner
-        external
-        returns (address collection)
-    {
+    ) external onlyOwner returns (address collection) {
         require(
             getCollection[msg.sender][_colCode] == address(0),
             "DropMaster : COLLECTION_EXISTS"
@@ -131,10 +122,6 @@ contract DropMaster is
         )
     {
         collectionInfo memory collection = collections[user][_code];
-        return (
-            collection.name,
-            collection.symbol,
-            collection.quantity
-        );
+        return (collection.name, collection.symbol, collection.quantity);
     }
 }
