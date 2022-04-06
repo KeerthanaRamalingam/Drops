@@ -122,7 +122,6 @@ interface IERC20 {
     );
 }
 
-
 // File @openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol@v3.4.1-solc-0.7
 
 pragma solidity ^0.7.0;
@@ -983,6 +982,86 @@ abstract contract ContextUpgradeable is Initializable {
     uint256[50] private __gap;
 }
 
+// OpenZeppelin Contracts v4.4.1 (access/Ownable.sol)
+
+pragma solidity ^0.7.0;
+
+/**
+ * @dev Contract module which provides a basic access control mechanism, where
+ * there is an account (an owner) that can be granted exclusive access to
+ * specific functions.
+ *
+ * By default, the owner account will be the one that deploys the contract. This
+ * can later be changed with {transferOwnership}.
+ *
+ * This module is used through inheritance. It will make available the modifier
+ * `onlyOwner`, which can be applied to your functions to restrict their use to
+ * the owner.
+ */
+abstract contract Ownable is ContextUpgradeable {
+    address private _owner;
+
+    event OwnershipTransferred(
+        address indexed previousOwner,
+        address indexed newOwner
+    );
+
+    /**
+     * @dev Initializes the contract setting the deployer as the initial owner.
+     */
+    function ownable_init(address owner_) internal initializer {
+        _transferOwnership(owner_);
+    }
+
+    /**
+     * @dev Returns the address of the current owner.
+     */
+    function owner() public view virtual returns (address) {
+        return _owner;
+    }
+
+    /**
+     * @dev Throws if called by any account other than the owner.
+     */
+    modifier onlyOwner() {
+        require(owner() == _msgSender(), "Ownable: caller is not the owner");
+        _;
+    }
+
+    /**
+     * @dev Leaves the contract without owner. It will not be possible to call
+     * `onlyOwner` functions anymore. Can only be called by the current owner.
+     *
+     * NOTE: Renouncing ownership will leave the contract without an owner,
+     * thereby removing any functionality that is only available to the owner.
+     */
+    function renounceOwnership() public virtual onlyOwner {
+        _transferOwnership(address(0));
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Can only be called by the current owner.
+     */
+    function transferOwnership(address newOwner) public virtual onlyOwner {
+        require(
+            newOwner != address(0),
+            "Ownable: new owner is the zero address"
+        );
+        _transferOwnership(newOwner);
+    }
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Internal function without access restriction.
+     */
+    function _transferOwnership(address newOwner) internal virtual {
+        address oldOwner = _owner;
+        _owner = newOwner;
+        emit OwnershipTransferred(oldOwner, newOwner);
+    }
+}
+
 // File @openzeppelin/contracts-upgradeable/utils/EnumerableSetUpgradeable.sol@v3.4.1-solc-0.7
 
 pragma solidity ^0.7.0;
@@ -1794,10 +1873,7 @@ contract ERC721Upgradeable is
      */
     bytes4 private constant _INTERFACE_ID_ERC721_ENUMERABLE = 0x780e9d63;
 
-    event WhiteList(
-        address whiteListedAddress,
-        bool status
-    );
+    event WhiteList(address whiteListedAddress, bool status);
 
     /**
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
@@ -1835,8 +1911,7 @@ contract ERC721Upgradeable is
         _registerInterface(_INTERFACE_ID_ERC721_ENUMERABLE);
     }
 
-    function _setTime(uint256 startDate_, uint256 endDate_) internal 
-    {
+    function _setTime(uint256 startDate_, uint256 endDate_) internal {
         _startDate = startDate_;
         _endDate = endDate_;
     }
@@ -1881,16 +1956,17 @@ contract ERC721Upgradeable is
     /**
      * Returns startDate of minting process
      */
-    function startDate() public view returns(uint256) {
+    function startDate() public view returns (uint256) {
         return _startDate;
     }
 
     /**
      * Returns endDate of minting process
      */
-    function endDate() public view returns(uint256) {
+    function endDate() public view returns (uint256) {
         return _endDate;
     }
+
     /**
      * @dev See {IERC721Metadata-tokenURI}.
      */
@@ -2628,7 +2704,6 @@ abstract contract NFT721Creator is Initializable, ERC721Upgradeable {
      */
     bytes4 private constant _INTERFACE_TOKEN_CREATOR = 0x40c1a064;
 
-
     modifier onlyCreatorAndOwner(uint256 tokenId) {
         require(
             tokenIdToCreator[tokenId] == msg.sender,
@@ -2647,7 +2722,6 @@ abstract contract NFT721Creator is Initializable, ERC721Upgradeable {
     function _initializeNFT721Creator() internal initializer {
         _registerInterface(_INTERFACE_TOKEN_CREATOR);
     }
-
 
     /**
      * @notice Returns the creator's address for a given tokenId.
@@ -2675,15 +2749,6 @@ abstract contract NFT721Creator is Initializable, ERC721Upgradeable {
         _burn(tokenId);
     }
 
-    /**
-     * @dev Remove the creator record when burned.
-     */
-    function _burn(uint256 tokenId) internal virtual override {
-        delete tokenIdToCreator[tokenId];
-
-        super._burn(tokenId);
-    }
-
     uint256[999] private ______gap;
 }
 
@@ -2709,6 +2774,7 @@ abstract contract NFT721Metadata is NFT721Creator {
         string indexed indexedTokenIPFSPath,
         string tokenIPFSPath
     );
+
     // This event was used in an order version of the contract
     //event NFTMetadataUpdated(string name, string symbol, string baseURI);
 
@@ -2754,14 +2820,6 @@ abstract contract NFT721Metadata is NFT721Creator {
         _setTokenURI(tokenId, _tokenIPFSPath);
     }
 
-    /**
-     * @dev When a token is burned, remove record of it allowing that creator to re-mint the same NFT again in the future.
-     */
-    function _burn(uint256 tokenId) internal virtual override {
-        delete creatorToIPFSHashToMinted[msg.sender][_tokenURIs[tokenId]];
-        super._burn(tokenId);
-    }
-
     uint256[999] private ______gap;
 }
 
@@ -2782,7 +2840,6 @@ abstract contract NFT721Mint is
     uint256 private nextTokenId;
     mapping(address => bool) public tokenAddress;
     mapping(address => uint256) public mintFees;
-    mapping(address => uint256) public updateUriFees;
 
     event Minted(
         address indexed creator,
@@ -2791,30 +2848,58 @@ abstract contract NFT721Mint is
         string tokenIPFSPath
     );
 
-    event TokenUpdated(
-        address indexed tokenAddress,
-        bool status
-    );
+    event TokenUpdated(address indexed tokenAddress, bool status);
 
-    event TokenFeesUpdated(
-        address indexed tokenAddress,
-        uint256 mintFee,
-        uint256 uriUpdateFee
-    );
-
-    event Updated(
-        address indexed creator,
-        uint256 indexed tokenId,
-        string indexed indexedTokenIPFSPath,
-        string tokenIPFSPath
-    );
+    event TokenFeesUpdated(address indexed tokenAddress, uint256 mintFee);
 
     modifier onlyWhitelistedUsers() {
         require(
-            whiteListedAddress[msg.sender]==true || whiteList == true,
-            "NFT721Mint:MINT_ADDRESS_NOT_AUTHORIZED"
+            whiteListedAddress[msg.sender] == true || whiteList == false,
+            "NFT721Mint : USER_ADDRESS_NOT_WHITELISTED"
         );
         _;
+    }
+
+    /**
+     * @notice To check the totalSupply.
+     */
+    function _supplyCheck(uint256 tokenId) internal view {
+        if (_supply != 0) {
+            require(tokenId <= _supply, "NFT721Mint : SUPPLY_LIMIT_REACHED");
+        }
+    }
+
+    /**
+     * @notice To pay fees.
+     */
+    function _feeCheck(address paymentToken) internal {
+        require(
+            tokenAddress[paymentToken] == true,
+            "NFT721Mint : INVALID_PAYMENT_TOKEN"
+        );
+        if (paymentToken != address(0)) {
+            IERC20(paymentToken).transferFrom(
+                msg.sender,
+                getDropsTreasury(),
+                mintFees[paymentToken]
+            );
+        } else {
+            require(
+                msg.value >= mintFees[paymentToken],
+                "NFT721Mint : INSUFFICIENT_FEE_AMOUNT"
+            );
+            getDropsTreasury().transfer(address(this).balance);
+        }
+    }
+
+    /**
+     * @notice To check the date.
+     */
+    function _dateCheck() internal view {
+        require(
+            _startDate <= block.timestamp, 
+            "NFT721Mint : MINTING_NOT_LIVE"
+        );
     }
 
     /**
@@ -2827,10 +2912,7 @@ abstract contract NFT721Mint is
     /**
      * @dev Called once after the initial deployment to set the initial tokenId.
      */
-    function _initializeNFT721Mint()
-        internal
-        initializer
-    {
+    function _initializeNFT721Mint() internal initializer {
         // Use ID 1 for the first NFT tokenId
         nextTokenId = 1;
     }
@@ -2838,93 +2920,20 @@ abstract contract NFT721Mint is
     /**
      * @notice Allows a creator to mint an NFT.
      */
-    function mint(string memory tokenIPFSPath,
-    address paymentToken)
-        public payable
+    function mint(string memory tokenIPFSPath, address paymentToken)
+        public
+        payable
         onlyWhitelistedUsers
         returns (uint256 tokenId)
     {
         tokenId = nextTokenId++;
-        if (_supply != 0) {
-            require(
-                tokenId <= _supply,
-                "NFT721Mint:MINT_LIMIT_REACHED"
-            );
-        }
-        require(_startDate <= block.timestamp, "NFT721Mint:MINTING_NOT_LIVE");
-        require(
-            tokenAddress[paymentToken] == true,
-            "NFT721Mint:INVALID_PAYMENT_MODE"
-        );
-        if (paymentToken != address(0)) {
-            IERC20(paymentToken).transferFrom(
-                msg.sender,
-                getDropsTreasury(),
-                mintFees[paymentToken]
-            );
-        } else {
-            require(
-                msg.value >= mintFees[paymentToken],
-                "NFT721Mint:INSUFFICIENT_FEE_AMOUNT"
-            );
-            getDropsTreasury().transfer(address(this).balance);
-        }
-
+        _supplyCheck(tokenId);
+        _dateCheck();
+        _feeCheck(paymentToken);
         _mint(msg.sender, tokenId);
         _updateTokenCreator(tokenId, msg.sender);
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
         emit Minted(msg.sender, tokenId, tokenIPFSPath, tokenIPFSPath);
-    } 
-
-    /**
-     * @notice Allows a creator to update an NFT.
-     */
-    function updateTokenURI(
-        uint256 tokenId,
-        string memory tokenIPFSPath,
-        address paymentToken
-    ) 
-        public payable
-        onlyWhitelistedUsers
-    {
-        address owner = ownerOf(tokenId);
-        require(msg.sender == owner, "NFT721Mint:NOT_AUTHORIZED");
-        require(
-            tokenAddress[paymentToken] == true,
-            "NFT721Mint:INVALID_PAYMENT_MODE"
-        );
-        
-        if (paymentToken != address(0)) {
-            IERC20(paymentToken).transferFrom(
-                msg.sender,
-                getDropsTreasury(),
-                updateUriFees[paymentToken]
-            );
-        } else {
-            require(
-                msg.value >= updateUriFees[paymentToken],
-                "NFT721Mint:INSUFFICIENT_FEE_AMOUNT"
-            );
-            getDropsTreasury().transfer(address(this).balance);
-        }
-        _setTokenIPFSPath(tokenId, tokenIPFSPath);
-        emit Updated(
-            msg.sender,
-            tokenId,
-            tokenIPFSPath,
-            tokenIPFSPath
-        );
-    }
-
-    /**
-     * @dev Explicit override to address compile errors.
-     */
-    function _burn(uint256 tokenId)
-        internal
-        virtual
-        override(ERC721Upgradeable, NFT721Creator, NFT721Metadata)
-    {
-        super._burn(tokenId);
     }
 
     uint256[1000] private ______gap;
@@ -2936,102 +2945,92 @@ pragma solidity ^0.7.0;
 
 /**
  * @title Drop NFTs implemented using the ERC-721 standard.
- * @dev This top level file holds no data directly to ease future upgrades.
  */
-contract DropsCollection is 
+contract PerpetualCollection is 
     ERC165Upgradeable,
     ERC721Upgradeable,
     NFT721Creator,
     NFT721Metadata,
     TreasuryNode,
     NFT721Core,
-    NFT721Mint
-    
+    NFT721Mint,
+    Ownable
 {
-    address public dropMaster;
-    modifier onlyAdmin() {
-        require(
-            msg.sender == dropMaster,
-            "DropsCollection:NOT_ADMIN_ROLE"
-        );
-        _;
-    }
-    
     /**
      * @notice Called once to configure the contract after the initial deployment.
      * @dev This farms the initialize call out to inherited contracts as needed.
      */
     function initialize(
         address payable treasury,
-        address _dropMaster,
         string memory name,
         string memory symbol,
         uint256 supply,
         uint256 startDate,
         uint256 endDate,
-        bool whitelisted
+        bool whitelisted,
+        address controller
     ) public initializer {
-        //require(msg.sender == dropMaster, "DropsCollection:ADDRESS_NOT_AUTHORIZED");
-        dropMaster = _dropMaster;
-        NFT721Creator._initializeNFT721Creator(); // leave
+        Ownable.ownable_init(controller);
+        NFT721Creator._initializeNFT721Creator();
         NFT721Mint._initializeNFT721Mint();
         TreasuryNode._initializeTreasuryNode(treasury);
-        ERC721Upgradeable.__ERC721_init(name, symbol, supply, startDate, endDate, whitelisted);
+        ERC721Upgradeable.__ERC721_init(
+            name,
+            symbol,
+            supply,
+            startDate,
+            endDate,
+            whitelisted
+        );
     }
 
     /**
      * @notice Allows a Drop admin to update NFT config variables.
      * @dev This must be called right after the initial call to `initialize`.
      */
-    function adminUpdateConfig(string memory baseURI)
-        public onlyAdmin
-    {
+    function adminUpdateBaseURI(string memory baseURI) public onlyOwner {
         _updateBaseURI(baseURI);
     }
 
     /**
-     * @dev This is a no-op, just an explicit override to address compile errors due to inheritance.
-     */
-    function _burn(uint256 tokenId)
-        internal
-        virtual
-        override(ERC721Upgradeable, NFT721Creator, NFT721Metadata, NFT721Mint)
-    {
-        super._burn(tokenId);
-    }
-     
-     /**
      * @notice Allows Admin to add token address.
      */
-    function adminUpdateToken(
-        address _tokenAddress,
-        bool status
-    ) public onlyAdmin {
+    function adminUpdateToken(address _tokenAddress, bool status)
+        public
+        onlyOwner
+    {
         tokenAddress[_tokenAddress] = status;
         emit TokenUpdated(_tokenAddress, status);
     }
 
-    function adminUpdateFees(
-        address _tokenAddress,
-        uint256 _mintFee,
-        uint256 _updateFee
-    ) public onlyAdmin {
-        require(tokenAddress[_tokenAddress]== true, "DropsCollection:INVALID_PAYMENT_TOKEN");
+    /**
+     * @notice Allows Admin to add fees for token address.
+     */
+
+    function adminUpdateFees(address _tokenAddress, uint256 _mintFee)
+        public
+        onlyOwner
+    {
+        require(
+            tokenAddress[_tokenAddress] == true,
+            "LimitedCollection : INVALID_PAYMENT_TOKEN"
+        );
         mintFees[_tokenAddress] = _mintFee;
-        updateUriFees[_tokenAddress] = _updateFee;
-
-        emit TokenFeesUpdated(_tokenAddress, _mintFee, _updateFee);
+        emit TokenFeesUpdated(_tokenAddress, _mintFee);
     }
 
-    function updateWhiteList(address[] memory _whiteListedAddress, bool[] memory status) public onlyAdmin {
-        require(whiteList == false, "DropsCollection:PUBLIC_COLLECTION");
-        for(uint256 i=0; i<_whiteListedAddress.length; i++) {
-            whiteListedAddress[_whiteListedAddress[i]]=status[i];
-            emit WhiteList(_whiteListedAddress[i], status[i]);
+    /**
+     * @notice Allows Admin to update address whitelist status.
+     */
+
+    function updateWhitelist(
+        address[] memory _whitelistAddresses,
+        bool[] memory status
+    ) public onlyOwner {
+        require(whiteList == true, "LimitedCollection : PUBLIC_COLLECTION");
+        for (uint256 i = 0; i < _whitelistAddresses.length; i++) {
+            whiteListedAddress[_whitelistAddresses[i]] = status[i];
+            emit WhiteList(_whitelistAddresses[i], status[i]);
         }
-    }
-
-    function changeAdmin(address _newAdmin) external onlyAdmin {
-        dropMaster = _newAdmin;   
     }
 }
