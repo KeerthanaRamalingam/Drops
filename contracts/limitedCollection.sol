@@ -2944,7 +2944,7 @@ pragma solidity ^0.7.0;
 /**
  * @title Drop NFTs implemented using the ERC-721 standard.
  */
-contract LimitedCollection is
+contract limitedCollection is
     ERC165Upgradeable,
     ERC721Upgradeable,
     NFT721Creator,
