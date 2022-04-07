@@ -1,5 +1,7 @@
 
+// File: contracts/limitedCollection.sol
 // SPDX-License-Identifier: UNLICENSED
+
 // File: contracts/Collection.sol
 
 // Sources flattened with hardhat v2.4.1 https://hardhat.org
@@ -7,7 +9,7 @@
 // File @openzeppelin/contracts-upgradeable/introspection/IERC165Upgradeable.sol@v3.4.1-solc-0.7
 
 pragma solidity ^0.7.0;
-
+pragma experimental ABIEncoderV2;
 /**
  * @dev Interface of the ERC165 standard, as defined in the
  * https://eips.ethereum.org/EIPS/eip-165[EIP].
@@ -1816,6 +1818,12 @@ contract ERC721Upgradeable is
 
     mapping(address => bool) internal whiteListedAddress;
 
+    //Mapping from tokenId to Properties
+    mapping(uint256 => string[]) public tokenIdToProp;
+
+    ////Mapping from Properties to its value
+    mapping(uint256 => mapping(string => string[])) public propTovalue;
+
     // Token name
     string private _name;
 
@@ -2844,7 +2852,9 @@ abstract contract NFT721Mint is
         address indexed creator,
         uint256 indexed tokenId,
         string indexed indexedTokenIPFSPath,
-        string tokenIPFSPath
+        string tokenIPFSPath,
+        string[] attributes,
+        string[] values
     );
 
     event TokenUpdated(address indexed tokenAddress, bool status);
@@ -2919,7 +2929,9 @@ abstract contract NFT721Mint is
     /**
      * @notice Allows a creator to mint an NFT.
      */
-    function mint(string memory tokenIPFSPath, address paymentToken)
+    function mint(string memory tokenIPFSPath, address paymentToken,
+        string[] memory attributes,
+        string[] memory values)
         public
         payable
         onlyWhitelistedUsers
@@ -2932,7 +2944,21 @@ abstract contract NFT721Mint is
         _mint(msg.sender, tokenId);
         _updateTokenCreator(tokenId, msg.sender);
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
-        emit Minted(msg.sender, tokenId, tokenIPFSPath, tokenIPFSPath);
+        for (uint256 i = 0; i < attributes.length; i++) {
+            tokenIdToProp[tokenId].push(attributes[i]);
+        }
+        for (uint256 i = 0; i < attributes.length; i++) {
+            propTovalue[tokenId][attributes[i]].push(values[i]);
+        }
+
+        emit Minted(
+            msg.sender,
+            tokenId,
+            tokenIPFSPath,
+            tokenIPFSPath,
+            attributes,
+            values
+        );
     }
 
     uint256[1000] private ______gap;
@@ -3033,11 +3059,11 @@ contract LimitedCollection is
         }
     }
 }
+// File: contracts/limtedCollectionMaster.sol
+
 
 pragma solidity ^0.7.0;
-
-// pragma experimental ABIEncoderV2;
-
+//pragma experimental ABIEncoderV2;
 contract LCMaster is Initializable, Ownable {
     address payable treasury;
 
@@ -3082,6 +3108,7 @@ contract LCMaster is Initializable, Ownable {
         uint256 quantity,
         uint256 startDate,
         uint256 endDate,
+        string[] attributes,
         bool whitelisted
     );
 
@@ -3095,6 +3122,7 @@ contract LCMaster is Initializable, Ownable {
         uint256 _startDate,
         uint256 _endDate,
         bool _whitelist,
+        string[] memory _attributes,
         address _controller
     ) external onlyOwner returns (address collection) {
         require(
@@ -3139,6 +3167,7 @@ contract LCMaster is Initializable, Ownable {
             _colQuantity,
             _startDate,
             _endDate,
+            _attributes,
             _whitelist
         );
     }
