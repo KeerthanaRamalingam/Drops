@@ -1819,10 +1819,10 @@ contract ERC721Upgradeable is
     mapping(address => bool) internal whiteListedAddress;
 
     //Mapping from tokenId to Properties
-    mapping(uint256 => string[]) public tokenIdToProp;
+    mapping(uint256 => string[]) public tokenProperties;
 
     ////Mapping from Properties to its value
-    mapping(uint256 => mapping(string => string[])) public propTovalue;
+    mapping(uint256 => mapping(string => string[])) public propertyValues;
 
     // Token name
     string private _name;
@@ -2945,10 +2945,10 @@ abstract contract NFT721Mint is
         _updateTokenCreator(tokenId, msg.sender);
         _setTokenIPFSPath(tokenId, tokenIPFSPath);
         for (uint256 i = 0; i < attributes.length; i++) {
-            tokenIdToProp[tokenId].push(attributes[i]);
+            tokenProperties[tokenId].push(attributes[i]);
         }
         for (uint256 i = 0; i < attributes.length; i++) {
-            propTovalue[tokenId][attributes[i]].push(values[i]);
+            propertyValues[tokenId][attributes[i]].push(values[i]);
         }
 
         emit Minted(
@@ -3082,6 +3082,8 @@ contract LCMaster is Initializable, Ownable {
         bool whitelist;
         // the contract address
         address myContract;
+        // the collection properties
+        string[] attributes;
     }
 
     /**
@@ -3156,7 +3158,8 @@ contract LCMaster is Initializable, Ownable {
             startDate: _startDate,
             endDate: _endDate,
             whitelist: _whitelist,
-            myContract: collection
+            myContract: collection,
+            attributes: _attributes
         });
 
         emit CollectionCreated(
