@@ -3184,10 +3184,11 @@ contract LCMaster is Initializable, Ownable {
         returns (
             string memory,
             string memory,
-            uint256
+            uint256,
+            string[] memory
         )
     {
         collectionInfo memory collection = collections[user][_code];
-        return (collection.name, collection.symbol, collection.quantity);
+        return (collection.name, collection.symbol, collection.quantity, collection.attributes);
     }
 }

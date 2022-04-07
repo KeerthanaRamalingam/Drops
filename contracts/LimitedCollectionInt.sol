@@ -1815,6 +1815,12 @@ contract ERC721Upgradeable is
 
     mapping(address => bool) internal whiteListedAddress;
 
+    //Mapping from tokenId to Properties
+    mapping(uint256 => string[]) public tokenProperties;
+
+    ////Mapping from Properties to its value
+    mapping(uint256 => mapping(string => string[])) public propertyValues;
+
     // Token name
     string private _name;
 
