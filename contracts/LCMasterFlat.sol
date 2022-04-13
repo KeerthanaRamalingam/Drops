@@ -1,6 +1,7 @@
-
-// File: contracts/limitedCollection.sol
 // SPDX-License-Identifier: UNLICENSED
+// File: contracts/limitedCollection.sol
+
+
 
 // File: contracts/Collection.sol
 
@@ -1816,12 +1817,12 @@ contract ERC721Upgradeable is
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
-    mapping(address => bool) internal whiteListedAddress;
+    mapping(address => bool) internal whitelistedAddress;
 
     //Mapping from tokenId to Properties
     mapping(uint256 => string[]) public tokenProperties;
 
-    ////Mapping from Properties to its value
+    //Mapping from Properties to its value
     mapping(uint256 => mapping(string => string[])) public propertyValues;
 
     // Token name
@@ -1845,8 +1846,8 @@ contract ERC721Upgradeable is
     //EndDate
     uint256 internal _endDate;
 
-    //WhiteList
-    bool public whiteList;
+    //Whitelist
+    bool public whitelist;
 
     /*
      *     bytes4(keccak256('balanceOf(address)')) == 0x70a08231
@@ -1882,7 +1883,7 @@ contract ERC721Upgradeable is
      */
     bytes4 private constant _INTERFACE_ID_ERC721_ENUMERABLE = 0x780e9d63;
 
-    event WhiteList(address whiteListedAddress, bool status);
+    event Whitelist(address whitelistedAddress, bool status);
 
     /**
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
@@ -1893,14 +1894,14 @@ contract ERC721Upgradeable is
         uint256 supply_,
         uint256 startDate_,
         uint256 endDate_,
-        bool whiteList_
+        bool whitelist_
     ) internal initializer {
         __Context_init_unchained();
         __ERC165_init_unchained();
         __ERC721_init_unchained(name_, symbol_);
         _updateSupply(supply_);
         _setTime(startDate_, endDate_);
-        whiteList = whiteList_;
+        whitelist = whitelist_;
     }
 
     function _updateSupply(uint256 supply_) internal {
@@ -2863,7 +2864,7 @@ abstract contract NFT721Mint is
 
     modifier onlyWhitelistedUsers() {
         require(
-            whiteListedAddress[msg.sender] == true || whiteList == false,
+            whitelistedAddress[msg.sender] == true || whitelist == false,
             "NFT721Mint : USER_ADDRESS_NOT_WHITELISTED"
         );
         _;
@@ -2879,8 +2880,15 @@ abstract contract NFT721Mint is
     }
 
     /**
-     * @notice To pay fees.
+     * @notice To check the date.
      */
+    function _dateCheck() internal view {
+        require(
+            _startDate <= block.timestamp && block.timestamp <= _endDate,
+            "NFT721Mint : MINTING_NOT_LIVE"
+        );
+    }
+
     function _feeCheck(address paymentToken) internal {
         require(
             tokenAddress[paymentToken] == true,
@@ -2899,16 +2907,6 @@ abstract contract NFT721Mint is
             );
             getDropsTreasury().transfer(address(this).balance);
         }
-    }
-
-    /**
-     * @notice To check the date.
-     */
-    function _dateCheck() internal view {
-        require(
-            _startDate <= block.timestamp && block.timestamp <= _endDate,
-            "NFT721Mint : MINTING_NOT_LIVE"
-        );
     }
 
     /**
@@ -2950,7 +2948,7 @@ abstract contract NFT721Mint is
         for (uint256 i = 0; i < attributes.length; i++) {
             propertyValues[tokenId][attributes[i]].push(values[i]);
         }
-
+        
         emit Minted(
             msg.sender,
             tokenId,
@@ -2960,6 +2958,7 @@ abstract contract NFT721Mint is
             values
         );
     }
+
 
     uint256[1000] private ______gap;
 }
@@ -3052,16 +3051,20 @@ contract LimitedCollection is
         address[] memory _whitelistAddresses,
         bool[] memory status
     ) public onlyOwner {
-        require(whiteList == true, "LimitedCollection : PUBLIC_COLLECTION");
+        require(whitelist == true, "LimitedCollection : PUBLIC_COLLECTION");
         for (uint256 i = 0; i < _whitelistAddresses.length; i++) {
-            whiteListedAddress[_whitelistAddresses[i]] = status[i];
-            emit WhiteList(_whitelistAddresses[i], status[i]);
+            whitelistedAddress[_whitelistAddresses[i]] = status[i];
+            emit Whitelist(_whitelistAddresses[i], status[i]);
         }
     }
 }
 // File: contracts/limtedCollectionMaster.sol
 
 
+
+
+pragma solidity ^0.7.0;
+//pragma experimental ABIEncoderV2;
 pragma solidity ^0.7.0;
 //pragma experimental ABIEncoderV2;
 contract LCMaster is Initializable, Ownable {
