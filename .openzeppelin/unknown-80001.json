@@ -199,6 +199,61 @@
       "address": "0xfC90fc073EC17a939B710033778843a69D89079F",
       "txHash": "0x3816adb71306a500b72930070684cf85c687390d90bc8c6c89273f27e135b560",
       "kind": "transparent"
+    },
+    {
+      "address": "0x9b24F601201EA43Da2ce96D3AA33ae773B5b3015",
+      "txHash": "0x86ee337ba714802eb59441627549729479348108504864381593483fca170f9a",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xE9BFbd56129060cE25b7668dB2760f003391F00A",
+      "txHash": "0x4997dccf05ca824b15f43ba1f52d8bc8e1d977ddf4e778118a28a97e9c807122",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x4240BaB6D56eb63867336E50E4A199f021Ea0161",
+      "txHash": "0xa5d33ab528d358f582a7a9acd675db5b612d9f474f6f58e971b6a1ea7c69d979",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xF9CD70f9970777EBDf7E693721E486683F55C970",
+      "txHash": "0xa837c75252d9b3f9bd2545289797599c6c9e4fcd2b2ecb4b9deab885bf9b6245",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x81D92253E7C56F93AA6528C9daa329b2e5c7424A",
+      "txHash": "0x80086c826ae8f1b695924242ce648e63b1294a49c46b15ff52bb16fbe77e073d",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x53449DFcccc84813fDb57a28c5A1F1dA2d716B46",
+      "txHash": "0xdedaae81edaae7123ff47471c65d26e303f35c61c21476dcf89f41dd48fee204",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xe6396a3c9a4723eBF6DAa95204AE52ec5cbF1d3e",
+      "txHash": "0x8f9ff2ee41a2aa241a6486fe03bc744aba890be6454888b5a33d9e02396e9473",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x48A8C06bd87AC44219B58D3Ee155148bf64cAF1F",
+      "txHash": "0xf08a2902e7a3bfe4f1ac01f5f42e6d61c19dce7f07a0c4025930b81ab54eff8b",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x5128cDB4e663F26b8a3f13EF4A824755c14168b6",
+      "txHash": "0x122afc7cb4866b95353c0b5cfe6288fe692765809e12334222dfc30d3d801fe0",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x71177B5dDD37F1647C904A764DB5C76F6323588f",
+      "txHash": "0x46638e3efb33f2b9c4b92e9668fe471cfff0ea063da8a2253a9452d9f40cac1c",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x38ba3ceC3041a16aee8D2CD9ADa3610CbFDC3Eb1",
+      "txHash": "0xe54103ee90535777f970f1956c54d13874f9477c6fbe57a420b89987a53171a8",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -3187,6 +3242,186 @@
     "695bac5e786186a6d957616d57fc5f47ac9b52a87dd6edcd67b7923e68c330b3": {
       "address": "0xec83C439BEF0cEBF286eaC2B07A49024Bc319440",
       "txHash": "0x41bcf17bedecfa8c38f4c2ecee229776cdf5bb9ca7a3af9799a2d9fe2851509c",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\LCMasterFlat.sol:367"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\LCMasterFlat.sol:372"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "contracts\\LCMasterFlat.sol:985"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "Ownable",
+            "src": "contracts\\LCMasterFlat.sol:1005"
+          },
+          {
+            "label": "treasury",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_address_payable",
+            "contract": "LCMaster",
+            "src": "contracts\\LCMasterFlat.sol:3068"
+          },
+          {
+            "label": "collections",
+            "offset": 0,
+            "slot": "53",
+            "type": "t_mapping(t_address,t_mapping(t_string_memory_ptr,t_struct(collectionInfo)4368_storage))",
+            "contract": "LCMaster",
+            "src": "contracts\\LCMasterFlat.sol:3099"
+          },
+          {
+            "label": "getCollection",
+            "offset": 0,
+            "slot": "54",
+            "type": "t_mapping(t_address,t_mapping(t_string_memory_ptr,t_address))",
+            "contract": "LCMaster",
+            "src": "contracts\\LCMasterFlat.sol:3101"
+          },
+          {
+            "label": "getCode",
+            "offset": 0,
+            "slot": "55",
+            "type": "t_mapping(t_address,t_string_storage)",
+            "contract": "LCMaster",
+            "src": "contracts\\LCMasterFlat.sol:3103"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_address_payable": {
+            "label": "address payable",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_string_storage)dyn_storage": {
+            "label": "string[]",
+            "numberOfBytes": "32"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_mapping(t_string_memory_ptr,t_address))": {
+            "label": "mapping(address => mapping(string => address))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_string_memory_ptr,t_struct(collectionInfo)4368_storage))": {
+            "label": "mapping(address => mapping(string => struct LCMaster.collectionInfo))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_string_storage)": {
+            "label": "mapping(address => string)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_string_memory_ptr,t_address)": {
+            "label": "mapping(string => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_string_memory_ptr,t_struct(collectionInfo)4368_storage)": {
+            "label": "mapping(string => struct LCMaster.collectionInfo)",
+            "numberOfBytes": "32"
+          },
+          "t_string_memory_ptr": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(collectionInfo)4368_storage": {
+            "label": "struct LCMaster.collectionInfo",
+            "members": [
+              {
+                "label": "name",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "symbol",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "1"
+              },
+              {
+                "label": "quantity",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "2"
+              },
+              {
+                "label": "startDate",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "3"
+              },
+              {
+                "label": "endDate",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "4"
+              },
+              {
+                "label": "whitelist",
+                "type": "t_bool",
+                "offset": 0,
+                "slot": "5"
+              },
+              {
+                "label": "myContract",
+                "type": "t_address",
+                "offset": 1,
+                "slot": "5"
+              },
+              {
+                "label": "attributes",
+                "type": "t_array(t_string_storage)dyn_storage",
+                "offset": 0,
+                "slot": "6"
+              }
+            ],
+            "numberOfBytes": "224"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        }
+      }
+    },
+    "d0d0286422dec03bbc0bdc476ca27af26068cf00230faec01f8f6b157b03fa08": {
+      "address": "0xE18ED6A56eB40C8f3260778513a8aFA99409c0FC",
+      "txHash": "0x1ac89be9d3ad0dfa789065a3325d1a02c259e1a85e6561054c5792d38c5d5816",
       "layout": {
         "storage": [
           {

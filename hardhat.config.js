@@ -22,7 +22,8 @@ const MAINNET_PRIVATE_KEY = process.env.MAINNET_PRIVATE_KEY;
 const MUMBAI_RPC_URL = "https://matic-mumbai.chainstacklabs.com";
 const MUMBAI_PRIVATE_KEY = process.env.MUMBAI_PRIVATE_KEY;
 
-
+const ROPSTEN_RPC_URL = "https://ropsten.infura.io/v3/9fe1548079c34c6ca0cd0a99d316a91d";
+const ROPSTEN_PRIVATE_KEY = process.env.ROPSTEN_PRIVATE_KEY;
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -47,6 +48,14 @@ module.exports = {
       url: MUMBAI_RPC_URL,
       accounts: [MUMBAI_PRIVATE_KEY],
       gasPrice: 35000000000,
+      // accounts: {
+      //   mnemonic: MNEMONIC,
+      // },
+      saveDeployments: true,
+    },
+    ropsten: {
+      url: ROPSTEN_RPC_URL,
+      accounts: [ROPSTEN_PRIVATE_KEY],
       // accounts: {
       //   mnemonic: MNEMONIC,
       // },
