@@ -1,6 +1,6 @@
-// SPDX-License-Identifier: UNLICENSED
-// File: contracts/limitedCollection.sol
 
+// File: contracts/limitedCollection.sol
+// SPDX-License-Identifier: UNLICENSED
 
 
 // File: contracts/Collection.sol
@@ -642,11 +642,6 @@ interface IERC721MetadataUpgradeable is IERC721Upgradeable {
      * @dev Returns the token collection symbol.
      */
     function symbol() external view returns (string memory);
-
-    /**
-     * @dev Returns the Uniform Resource Identifier (URI) for `tokenId` token.
-     */
-    function tokenURI(uint256 tokenId) external view returns (string memory);
 }
 
 // File @openzeppelin/contracts-upgradeable/token/ERC721/IERC721EnumerableUpgradeable.sol@v3.4.1-solc-0.7
@@ -1819,20 +1814,11 @@ contract ERC721Upgradeable is
 
     mapping(address => bool) internal whitelistedAddress;
 
-    //Mapping from tokenId to Properties
-    mapping(uint256 => string[]) public tokenProperties;
-
-    //Mapping from Properties to its value
-    mapping(uint256 => mapping(string => string[])) public propertyValues;
-
     // Token name
     string private _name;
 
     // Token symbol
     string private _symbol;
-
-    // Optional mapping for token URIs
-    mapping(uint256 => string) internal _tokenURIs;
 
     // Token totalSupply
     uint256 internal _supply;
@@ -1975,34 +1961,6 @@ contract ERC721Upgradeable is
      */
     function endDate() public view returns (uint256) {
         return _endDate;
-    }
-
-    /**
-     * @dev See {IERC721Metadata-tokenURI}.
-     */
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        override
-        returns (string memory)
-    {
-        require(
-            _exists(tokenId),
-            "ERC721Metadata: URI query for nonexistent token"
-        );
-
-        string memory _tokenURI = _tokenURIs[tokenId];
-
-        // If there is no base URI, return the token URI.
-        if (bytes(_baseURI).length == 0) {
-            return _tokenURI;
-        }
-        // If both are set, concatenate the baseURI and tokenURI (via abi.encodePacked).
-        if (bytes(_tokenURI).length > 0) {
-            return string(abi.encodePacked(_baseURI, _tokenURI));
-        }
-        // If there is a baseURI but no tokenURI, concatenate the tokenID to the baseURI.
-        return string(abi.encodePacked(_baseURI, tokenId.toString()));
     }
 
     /**
@@ -2288,9 +2246,9 @@ contract ERC721Upgradeable is
         _approve(address(0), tokenId);
 
         // Clear metadata (if any)
-        if (bytes(_tokenURIs[tokenId]).length != 0) {
+        /*if (bytes(_tokenURIs[tokenId]).length != 0) {
             delete _tokenURIs[tokenId];
-        }
+        }*/
 
         _holderTokens[owner].remove(tokenId);
 
@@ -2333,24 +2291,6 @@ contract ERC721Upgradeable is
         _tokenOwners.set(tokenId, to);
 
         emit Transfer(from, to, tokenId);
-    }
-
-    /**
-     * @dev Sets `_tokenURI` as the tokenURI of `tokenId`.
-     *
-     * Requirements:
-     *
-     * - `tokenId` must exist.
-     */
-    function _setTokenURI(uint256 tokenId, string memory _tokenURI)
-        internal
-        virtual
-    {
-        require(
-            _exists(tokenId),
-            "ERC721Metadata: URI set of nonexistent token"
-        );
-        _tokenURIs[tokenId] = _tokenURI;
     }
 
     /**
@@ -2768,64 +2708,13 @@ pragma solidity ^0.7.0;
  * @notice A mixin to extend the OpenZeppelin metadata implementation.
  */
 abstract contract NFT721Metadata is NFT721Creator {
-    // using StringsUpgradeable for uint256;
-
-    /**
-     * @dev Stores hashes minted by a creator to prevent duplicates.
-     */
-    mapping(address => mapping(string => bool))
-        private creatorToIPFSHashToMinted;
 
     event BaseURIUpdated(string baseURI);
-    event TokenIPFSPathUpdated(
-        uint256 indexed tokenId,
-        string indexed indexedTokenIPFSPath,
-        string tokenIPFSPath
-    );
-
-    // This event was used in an order version of the contract
-    //event NFTMetadataUpdated(string name, string symbol, string baseURI);
-
-    /**
-     * @notice Returns the IPFSPath to the metadata JSON file for a given NFT.
-     */
-    function getTokenIPFSPath(uint256 tokenId)
-        public
-        view
-        returns (string memory)
-    {
-        return _tokenURIs[tokenId];
-    }
 
     function _updateBaseURI(string memory _baseURI) internal {
         _setBaseURI(_baseURI);
 
         emit BaseURIUpdated(_baseURI);
-    }
-
-    /**
-     * @dev The IPFS path should be the CID + file.extension, e.g.
-     * `QmfPsfGwLhiJrU8t9HpG4wuyjgPo9bk8go4aQqSu9Qg4h7/metadata.json`
-     */
-    function _setTokenIPFSPath(uint256 tokenId, string memory _tokenIPFSPath)
-        internal
-    {
-        // 46 is the minimum length for an IPFS content hash, it may be longer if paths are used
-        require(
-            bytes(_tokenIPFSPath).length >= 46,
-            "NFT721Metadata: Invalid IPFS path"
-        );
-        require(
-            !creatorToIPFSHashToMinted[msg.sender][_tokenIPFSPath],
-            "NFT721Metadata: NFT was already minted"
-        );
-        if (creatorToIPFSHashToMinted[msg.sender][getTokenIPFSPath(tokenId)])
-            creatorToIPFSHashToMinted[msg.sender][
-                getTokenIPFSPath(tokenId)
-            ] = false;
-
-        creatorToIPFSHashToMinted[msg.sender][_tokenIPFSPath] = true;
-        _setTokenURI(tokenId, _tokenIPFSPath);
     }
 
     uint256[999] private ______gap;
@@ -2851,11 +2740,8 @@ abstract contract NFT721Mint is
 
     event Minted(
         address indexed creator,
-        uint256 indexed tokenId,
-        string indexed indexedTokenIPFSPath,
-        string tokenIPFSPath,
-        string[] attributes,
-        string[] values
+        address indexed paymentToken,
+        uint256 indexed tokenId
     );
 
     event TokenUpdated(address indexed tokenAddress, bool status);
@@ -2927,9 +2813,7 @@ abstract contract NFT721Mint is
     /**
      * @notice Allows a creator to mint an NFT.
      */
-    function mint(string memory tokenIPFSPath, address paymentToken,
-        string[] memory attributes,
-        string[] memory values)
+    function mint(address paymentToken)
         public
         payable
         onlyWhitelistedUsers
@@ -2941,21 +2825,11 @@ abstract contract NFT721Mint is
         _feeCheck(paymentToken);
         _mint(msg.sender, tokenId);
         _updateTokenCreator(tokenId, msg.sender);
-        _setTokenIPFSPath(tokenId, tokenIPFSPath);
-        for (uint256 i = 0; i < attributes.length; i++) {
-            tokenProperties[tokenId].push(attributes[i]);
-        }
-        for (uint256 i = 0; i < attributes.length; i++) {
-            propertyValues[tokenId][attributes[i]].push(values[i]);
-        }
         
         emit Minted(
             msg.sender,
-            tokenId,
-            tokenIPFSPath,
-            tokenIPFSPath,
-            attributes,
-            values
+            paymentToken,
+            tokenId
         );
     }
 
@@ -3064,7 +2938,6 @@ contract LimitedCollection is
 
 
 pragma solidity ^0.7.0;
-//pragma experimental ABIEncoderV2;
 pragma solidity ^0.7.0;
 //pragma experimental ABIEncoderV2;
 contract LCMaster is Initializable, Ownable {
