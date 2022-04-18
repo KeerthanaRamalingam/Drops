@@ -1,6 +1,6 @@
-
-// File: contracts/limitedCollection.sol
 // SPDX-License-Identifier: UNLICENSED
+// File: contracts/limitedCollection.sol
+
 
 
 // File: contracts/Collection.sol
@@ -2413,6 +2413,13 @@ interface IAdminRole {
     function isAdmin(address account) external view returns (bool);
 }
 
+interface ConversionInt {
+    function convertMintFee(address paymentToken, uint256 mintFee)
+        external
+        view
+        returns (uint256);
+}
+
 pragma solidity ^0.7.0;
 
 /**
@@ -2734,9 +2741,12 @@ abstract contract NFT721Mint is
     NFT721Metadata,
     TreasuryNode
 {
+    using SafeMathUpgradeable for uint256;
     uint256 private nextTokenId;
     mapping(address => bool) public tokenAddress;
-    mapping(address => uint256) public mintFees;
+    uint256 internal mintFee;
+    uint256 public deviationPercentage;
+    address public conversionAddress;
 
     event Minted(
         address indexed creator,
@@ -2744,16 +2754,26 @@ abstract contract NFT721Mint is
         uint256 indexed tokenId
     );
 
+    event BaseTokenAdded(uint256 mintFee);
+
     event TokenUpdated(address indexed tokenAddress, bool status);
 
     event TokenFeesUpdated(address indexed tokenAddress, uint256 mintFee);
 
+    event DeviationPercentage(uint256 percentage);
     modifier onlyWhitelistedUsers() {
         require(
             whitelistedAddress[msg.sender] == true || whitelist == false,
             "NFT721Mint : USER_ADDRESS_NOT_WHITELISTED"
         );
         _;
+    }
+
+    /**
+     * @dev Get USD fee for mint
+     */
+    function getMintFee() public view returns (uint256) {
+        return mintFee;
     }
 
     /**
@@ -2775,23 +2795,32 @@ abstract contract NFT721Mint is
         );
     }
 
-    function _feeCheck(address paymentToken) internal {
+     function checkDeviation(uint256 feeAmount, uint256 price) public view {
         require(
-            tokenAddress[paymentToken] == true,
-            "NFT721Mint : INVALID_PAYMENT_TOKEN"
+            feeAmount >= price.sub((price.mul(deviationPercentage)).div(100)) &&
+                feeAmount <=
+                price.add((price.mul(deviationPercentage)).div(100)),
+            "Amount not within deviation percentage"
+        );
+    }
+
+    function checkMintFees(address paymentToken, uint256 feeAmount) internal {
+        address payable treasury_ = getDropsTreasury();
+        uint256 price = ConversionInt(conversionAddress).convertMintFee(
+            paymentToken,
+            getMintFee()
         );
         if (paymentToken != address(0)) {
+            checkDeviation(feeAmount, price);
             IERC20(paymentToken).transferFrom(
                 msg.sender,
                 getDropsTreasury(),
-                mintFees[paymentToken]
+                feeAmount
             );
         } else {
-            require(
-                msg.value >= mintFees[paymentToken],
-                "NFT721Mint : INSUFFICIENT_FEE_AMOUNT"
-            );
-            getDropsTreasury().transfer(address(this).balance);
+            checkDeviation(msg.value, price);
+            (bool success, ) = treasury_.call{value: msg.value}("");
+            require(success, "Transfer failed.");
         }
     }
 
@@ -2813,7 +2842,7 @@ abstract contract NFT721Mint is
     /**
      * @notice Allows a creator to mint an NFT.
      */
-    function mint(address paymentToken)
+    function mint(address paymentToken, uint256 feeAmount)
         public
         payable
         onlyWhitelistedUsers
@@ -2822,7 +2851,8 @@ abstract contract NFT721Mint is
         tokenId = nextTokenId++;
         _supplyCheck(tokenId);
         _dateCheck();
-        _feeCheck(paymentToken);
+        checkMintFees(paymentToken, feeAmount);
+        //_feeCheck(paymentToken);
         _mint(msg.sender, tokenId);
         _updateTokenCreator(tokenId, msg.sender);
         
@@ -2866,7 +2896,8 @@ contract LimitedCollection is
         uint256 startDate,
         uint256 endDate,
         bool whitelisted,
-        address controller
+        address controller,
+        address conversion
     ) public initializer {
         Ownable.ownable_init(controller);
         NFT721Creator._initializeNFT721Creator();
@@ -2880,6 +2911,7 @@ contract LimitedCollection is
             endDate,
             whitelisted
         );
+        conversionAddress = conversion;
     }
 
     /**
@@ -2890,10 +2922,21 @@ contract LimitedCollection is
         _updateBaseURI(baseURI);
     }
 
+     /**
+     * @notice Allows Admin to set fees.
+     */
+    function adminUpdateFeeAmount(uint256 _mintFee)
+        public
+        onlyOwner
+    {
+        mintFee = _mintFee;
+        emit BaseTokenAdded(_mintFee);
+    }
+
     /**
      * @notice Allows Admin to add token address.
      */
-    function adminUpdateToken(address _tokenAddress, bool status)
+    function adminUpdateFeeToken(address _tokenAddress, bool status)
         public
         onlyOwner
     {
@@ -2902,19 +2945,14 @@ contract LimitedCollection is
     }
 
     /**
-     * @notice Allows Admin to add fees for token address.
+     * @notice Allows Admin to add token address.
      */
-
-    function adminUpdateFees(address _tokenAddress, uint256 _mintFee)
+    function adminUpdateDeviation(uint256 _deviationPercentage)
         public
         onlyOwner
     {
-        require(
-            tokenAddress[_tokenAddress] == true,
-            "LimitedCollection : INVALID_PAYMENT_TOKEN"
-        );
-        mintFees[_tokenAddress] = _mintFee;
-        emit TokenFeesUpdated(_tokenAddress, _mintFee);
+        deviationPercentage = _deviationPercentage;
+        emit DeviationPercentage(_deviationPercentage);
     }
 
     /**
@@ -2938,6 +2976,7 @@ contract LimitedCollection is
 
 
 pragma solidity ^0.7.0;
+//pragma experimental ABIEncoderV2;
 pragma solidity ^0.7.0;
 //pragma experimental ABIEncoderV2;
 contract LCMaster is Initializable, Ownable {
@@ -3001,7 +3040,8 @@ contract LCMaster is Initializable, Ownable {
         uint256 _endDate,
         bool _whitelist,
         string[] memory _attributes,
-        address _controller
+        address _controller,
+        address conversionAddress
     ) external onlyOwner returns (address collection) {
         require(
             getCollection[msg.sender][_colCode] == address(0),
@@ -3025,7 +3065,8 @@ contract LCMaster is Initializable, Ownable {
             _startDate,
             _endDate,
             _whitelist,
-            _controller
+            _controller,
+            conversionAddress
         );
         collections[msg.sender][_colCode] = collectionInfo({
             name: _colName,
