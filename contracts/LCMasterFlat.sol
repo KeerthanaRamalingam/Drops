@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+
 // File: contracts/limitedCollection.sol
 
 
@@ -2976,7 +2976,7 @@ contract LimitedCollection is
 
 
 pragma solidity ^0.7.0;
-//pragma experimental ABIEncoderV2;
+pragma experimental ABIEncoderV2;
 pragma solidity ^0.7.0;
 //pragma experimental ABIEncoderV2;
 contract LCMaster is Initializable, Ownable {
@@ -3001,6 +3001,24 @@ contract LCMaster is Initializable, Ownable {
         string[] attributes;
     }
 
+    struct collectionDetails {
+        // the collection description
+        string description;
+        // the collection image
+        string image;
+        // the collection gender
+        string gender;
+        // the collection category
+        string category;
+        // the collection theme
+        string theme;
+        // the collection grade
+        string grade;
+        // the collection type_
+        string type_;
+    }
+
+
     /**
      * @notice Called once to configure the contract after the initial deployment.
      * @dev This farms the initialize call out to inherited contracts as needed.
@@ -3012,6 +3030,9 @@ contract LCMaster is Initializable, Ownable {
 
     // collection info mapping
     mapping(address => mapping(string => collectionInfo)) public collections;
+
+    // collection details mapping
+    mapping(address => mapping(string => collectionDetails)) public details;
     // get collection
     mapping(address => mapping(string => address)) public getCollection;
     // get collection code with address
@@ -3029,6 +3050,17 @@ contract LCMaster is Initializable, Ownable {
         bool whitelisted
     );
 
+    event CollectionDetailsAdded(
+        string colCode,
+        string description,
+        string image,
+        string gender,
+        string category,
+        string theme,
+        string grade,
+        string type_
+    );
+
     /**
      * @notice Allows admin to create a collection.
      */
@@ -3041,7 +3073,7 @@ contract LCMaster is Initializable, Ownable {
         bool _whitelist,
         string[] memory _attributes,
         address _controller,
-        address conversionAddress
+        address _conversionAddress
     ) external onlyOwner returns (address collection) {
         require(
             getCollection[msg.sender][_colCode] == address(0),
@@ -3066,7 +3098,7 @@ contract LCMaster is Initializable, Ownable {
             _endDate,
             _whitelist,
             _controller,
-            conversionAddress
+            _conversionAddress
         );
         collections[msg.sender][_colCode] = collectionInfo({
             name: _colName,
@@ -3090,6 +3122,43 @@ contract LCMaster is Initializable, Ownable {
             _attributes,
             _whitelist
         );
+    }
+
+    /**
+     * @notice Function to add the collection details.
+     */
+    function addCollectionDetails(
+        string memory _colCode,
+        string memory _description,
+        string memory _image,
+        string memory _gender,
+        string memory _category,
+        string memory _theme,
+        string memory _grade,
+        string memory _type
+        ) public onlyOwner {
+        
+        details[msg.sender][_colCode] = collectionDetails({
+        description: _description,
+        image: _image,
+        gender: _gender,
+        category: _category,
+        theme: _theme,
+        grade: _grade,
+        type_: _type
+        });
+
+        emit CollectionDetailsAdded(
+            _colCode,
+            _description,
+            _image,
+            _gender,
+            _category,
+            _theme,
+            _grade,
+            _type              
+        );
+        
     }
 
     /**
