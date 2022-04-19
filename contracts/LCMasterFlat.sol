@@ -122,6 +122,21 @@ interface IERC20 {
     );
 }
 
+/**
+ * @dev Interface of the Price conversion contract
+ */
+interface ConversionInt {
+    function convertMintFee(address paymentToken, uint256 mintFee)
+        external
+        view
+        returns (uint256);
+
+    function convertUpdateFee(address paymentToken, uint256 updateFee)
+        external
+        view
+        returns (uint256);
+}
+
 // File @openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol@v3.4.1-solc-0.7
 
 pragma solidity ^0.7.0;
@@ -1722,6 +1737,12 @@ contract ERC721Upgradeable is
     //WhiteList
     bool public whiteList;
 
+    // Price Conversion
+    address public priceConversion;
+
+    // Deviation Percentage
+    uint256 public deviationPercentage;
+
     // Collection array
     string[] internal _collectionDetails;
 
@@ -1771,6 +1792,7 @@ contract ERC721Upgradeable is
         uint256 startDate_,
         uint256 endDate_,
         bool whiteList_,
+        address priceConversion_,
         string[] memory collectionDetails_
     ) internal initializer {
         __Context_init_unchained();
@@ -1779,6 +1801,7 @@ contract ERC721Upgradeable is
         _updateSupply(supply_);
         _setTime(startDate_, endDate_);
         whiteList = whiteList_;
+        priceConversion = priceConversion_;
         _collectionDetails = collectionDetails_;
     }
 
@@ -2472,9 +2495,10 @@ abstract contract NFT721Mint is
     NFT721Metadata,
     TreasuryNode
 {
+    using SafeMathUpgradeable for uint256;
     uint256 private nextTokenId;
     mapping(address => bool) public tokenAddress;
-    mapping(address => uint256) public mintFees;
+    uint256 internal mintFee;
 
     event Minted(address indexed creator, uint256 indexed tokenId);
 
@@ -2482,7 +2506,9 @@ abstract contract NFT721Mint is
 
     event TokenUpdated(address indexed tokenAddress, bool status);
 
-    event TokenFeesUpdated(address indexed tokenAddress, uint256 mintFee);
+    event TokenFeesUpdated(uint256 mintFee);
+
+    event DeviationPercentage(uint256 percentage);
 
     modifier onlyWhitelistedUsers() {
         require(
@@ -2495,7 +2521,7 @@ abstract contract NFT721Mint is
     /**
      * @notice To check the totalSupply.
      */
-    function _supplyCheck(uint256 tokenId) internal view {
+    function checkSupply(uint256 tokenId) internal view {
         if (_supply != 0) {
             require(tokenId <= _supply, "NFT721Mint : SUPPLY_LIMIT_REACHED");
         }
@@ -2504,30 +2530,39 @@ abstract contract NFT721Mint is
     /**
      * @notice To pay fees.
      */
-    function _feeCheck(address paymentToken) internal {
-        require(
-            tokenAddress[paymentToken] == true,
-            "NFT721Mint : INVALID_PAYMENT_TOKEN"
+    function checkMintFees(address paymentToken, uint256 feeAmount) internal {
+        address payable treasury_ = getDropsTreasury();
+        uint256 price = ConversionInt(priceConversion).convertMintFee(
+            paymentToken,
+            getMintFee()
         );
         if (paymentToken != address(0)) {
+            checkDeviation(feeAmount, price);
             IERC20(paymentToken).transferFrom(
                 msg.sender,
                 getDropsTreasury(),
-                mintFees[paymentToken]
+                feeAmount
             );
         } else {
-            require(
-                msg.value >= mintFees[paymentToken],
-                "NFT721Mint : INSUFFICIENT_FEE_AMOUNT"
-            );
-            getDropsTreasury().transfer(address(this).balance);
+            checkDeviation(msg.value, price);
+            (bool success, ) = treasury_.call{value: msg.value}("");
+            require(success, "Transfer failed.");
         }
+    }
+
+    function checkDeviation(uint256 feeAmount, uint256 price) public view {
+        require(
+            feeAmount >= price.sub((price.mul(deviationPercentage)).div(100)) &&
+                feeAmount <=
+                price.add((price.mul(deviationPercentage)).div(100)),
+            "Amount not within deviation percentage"
+        );
     }
 
     /**
      * @notice To check the date.
      */
-    function _dateCheck() internal view {
+    function checkDate() internal view {
         require(
             _startDate <= block.timestamp && block.timestamp <= _endDate,
             "NFT721Mint : MINTING_NOT_LIVE"
@@ -2542,6 +2577,13 @@ abstract contract NFT721Mint is
     }
 
     /**
+     * @notice Gets the mint Fee
+     */
+    function getMintFee() public view returns (uint256) {
+        return mintFee;
+    }
+
+    /**
      * @dev Called once after the initial deployment to set the initial tokenId.
      */
     function _initializeNFT721Mint() internal initializer {
@@ -2552,16 +2594,16 @@ abstract contract NFT721Mint is
     /**
      * @notice Allows a creator to mint an NFT.
      */
-    function mint(address paymentToken)
+    function mint(address paymentToken, uint256 feeAmount)
         public
         payable
         onlyWhitelistedUsers
         returns (uint256 tokenId)
     {
         tokenId = nextTokenId++;
-        _supplyCheck(tokenId);
-        _dateCheck();
-        _feeCheck(paymentToken);
+        checkSupply(tokenId);
+        checkDate();
+        checkMintFees(paymentToken, feeAmount);
         _mint(msg.sender, tokenId);
         _updateTokenCreator(tokenId, msg.sender);
         emit Minted(msg.sender, tokenId);
@@ -2600,6 +2642,7 @@ contract LimitedCollection is
         uint256 startDate,
         uint256 endDate,
         bool whitelisted,
+        address priceConversion,
         string[] memory collectionDetails
     ) public initializer {
         Ownable.ownable_init();
@@ -2613,6 +2656,7 @@ contract LimitedCollection is
             startDate,
             endDate,
             whitelisted,
+            priceConversion,
             collectionDetails
         );
         emit CollectionDetails(collectionDetails);
@@ -2641,16 +2685,20 @@ contract LimitedCollection is
      * @notice Allows Admin to add fees for token address.
      */
 
-    function adminUpdateFees(address _tokenAddress, uint256 _mintFee)
+    function adminUpdateFees(uint256 _mintFee) public onlyOwner {
+        mintFee = _mintFee;
+        emit TokenFeesUpdated(mintFee);
+    }
+
+    /**
+     * @notice Allows Admin to update deviation percentage
+     */
+    function adminUpdateDeviation(uint256 _deviationPercentage)
         public
         onlyOwner
     {
-        require(
-            tokenAddress[_tokenAddress] == true,
-            "DropsCollection : INVALID_PAYMENT_TOKEN"
-        );
-        mintFees[_tokenAddress] = _mintFee;
-        emit TokenFeesUpdated(_tokenAddress, _mintFee);
+        deviationPercentage = _deviationPercentage;
+        emit DeviationPercentage(_deviationPercentage);
     }
 
     /**
