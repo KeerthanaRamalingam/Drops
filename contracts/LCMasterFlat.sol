@@ -1,8 +1,4 @@
-
-// File: contracts/limitedCollection.sol
-
-
-
+// SPDX-License-Identifier: UNLICENSED
 // File: contracts/Collection.sol
 
 // Sources flattened with hardhat v2.4.1 https://hardhat.org
@@ -10,7 +6,7 @@
 // File @openzeppelin/contracts-upgradeable/introspection/IERC165Upgradeable.sol@v3.4.1-solc-0.7
 
 pragma solidity ^0.7.0;
-pragma experimental ABIEncoderV2;
+
 /**
  * @dev Interface of the ERC165 standard, as defined in the
  * https://eips.ethereum.org/EIPS/eip-165[EIP].
@@ -642,6 +638,11 @@ interface IERC721MetadataUpgradeable is IERC721Upgradeable {
      * @dev Returns the token collection symbol.
      */
     function symbol() external view returns (string memory);
+
+    /**
+     * @dev Returns the Uniform Resource Identifier (URI) for `tokenId` token.
+     */
+    function tokenURI(uint256 tokenId) external view returns (string memory);
 }
 
 // File @openzeppelin/contracts-upgradeable/token/ERC721/IERC721EnumerableUpgradeable.sol@v3.4.1-solc-0.7
@@ -1008,8 +1009,8 @@ abstract contract Ownable is ContextUpgradeable {
     /**
      * @dev Initializes the contract setting the deployer as the initial owner.
      */
-    function ownable_init(address owner_) internal initializer {
-        _transferOwnership(owner_);
+    function ownable_init() internal initializer {
+        _transferOwnership(_msgSender());
     }
 
     /**
@@ -1812,13 +1813,16 @@ contract ERC721Upgradeable is
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
-    mapping(address => bool) internal whitelistedAddress;
+    mapping(address => bool) internal whiteListedAddress;
 
     // Token name
     string private _name;
 
     // Token symbol
     string private _symbol;
+
+    // Optional mapping for token URIs
+    mapping(uint256 => string) internal _tokenURIs;
 
     // Token totalSupply
     uint256 internal _supply;
@@ -1832,8 +1836,11 @@ contract ERC721Upgradeable is
     //EndDate
     uint256 internal _endDate;
 
-    //Whitelist
-    bool public whitelist;
+    //WhiteList
+    bool public whiteList;
+
+    // Collection array
+    string[] internal _collectionDetails;
 
     /*
      *     bytes4(keccak256('balanceOf(address)')) == 0x70a08231
@@ -1869,7 +1876,7 @@ contract ERC721Upgradeable is
      */
     bytes4 private constant _INTERFACE_ID_ERC721_ENUMERABLE = 0x780e9d63;
 
-    event Whitelist(address whitelistedAddress, bool status);
+    event WhiteList(address whiteListedAddress, bool status);
 
     /**
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
@@ -1880,14 +1887,16 @@ contract ERC721Upgradeable is
         uint256 supply_,
         uint256 startDate_,
         uint256 endDate_,
-        bool whitelist_
+        bool whiteList_,
+        string[] memory collectionDetails_
     ) internal initializer {
         __Context_init_unchained();
         __ERC165_init_unchained();
         __ERC721_init_unchained(name_, symbol_);
         _updateSupply(supply_);
         _setTime(startDate_, endDate_);
-        whitelist = whitelist_;
+        whiteList = whiteList_;
+        _collectionDetails = collectionDetails_;
     }
 
     function _updateSupply(uint256 supply_) internal {
@@ -1961,6 +1970,61 @@ contract ERC721Upgradeable is
      */
     function endDate() public view returns (uint256) {
         return _endDate;
+    }
+
+    /**
+     * Returns all collection details
+     */
+    function getCollectionDetails()
+        public
+        view
+        returns (
+            string memory description,
+            string memory image,
+            string memory gender,
+            string memory category,
+            string memory theme,
+            string memory grade,
+            string memory colType
+        )
+    {
+        return (
+            _collectionDetails[0],
+            _collectionDetails[1],
+            _collectionDetails[2],
+            _collectionDetails[3],
+            _collectionDetails[4],
+            _collectionDetails[5],
+            _collectionDetails[6]
+        );
+    }
+
+    /**
+     * @dev See {IERC721Metadata-tokenURI}.
+     */
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        override
+        returns (string memory)
+    {
+        require(
+            _exists(tokenId),
+            "ERC721Metadata: URI query for nonexistent token"
+        );
+
+        string memory _tokenURI = _tokenURIs[tokenId];
+
+        // If there is no base URI, return the token URI.
+        if (bytes(_baseURI).length == 0) {
+            return _tokenURI;
+        }
+        // If both are set, concatenate the baseURI and tokenURI (via abi.encodePacked).
+        if (bytes(_tokenURI).length > 0) {
+            return string(abi.encodePacked(_baseURI, _tokenURI));
+        }
+        // If there is a baseURI but no tokenURI, concatenate the tokenID to the baseURI.
+        return string(abi.encodePacked(_baseURI, tokenId.toString()));
     }
 
     /**
@@ -2246,9 +2310,9 @@ contract ERC721Upgradeable is
         _approve(address(0), tokenId);
 
         // Clear metadata (if any)
-        /*if (bytes(_tokenURIs[tokenId]).length != 0) {
+        if (bytes(_tokenURIs[tokenId]).length != 0) {
             delete _tokenURIs[tokenId];
-        }*/
+        }
 
         _holderTokens[owner].remove(tokenId);
 
@@ -2291,6 +2355,24 @@ contract ERC721Upgradeable is
         _tokenOwners.set(tokenId, to);
 
         emit Transfer(from, to, tokenId);
+    }
+
+    /**
+     * @dev Sets `_tokenURI` as the tokenURI of `tokenId`.
+     *
+     * Requirements:
+     *
+     * - `tokenId` must exist.
+     */
+    function _setTokenURI(uint256 tokenId, string memory _tokenURI)
+        internal
+        virtual
+    {
+        require(
+            _exists(tokenId),
+            "ERC721Metadata: URI set of nonexistent token"
+        );
+        _tokenURIs[tokenId] = _tokenURI;
     }
 
     /**
@@ -2411,13 +2493,6 @@ pragma solidity ^0.7.0;
  */
 interface IAdminRole {
     function isAdmin(address account) external view returns (bool);
-}
-
-interface ConversionInt {
-    function convertMintFee(address paymentToken, uint256 mintFee)
-        external
-        view
-        returns (uint256);
 }
 
 pragma solidity ^0.7.0;
@@ -2715,13 +2790,64 @@ pragma solidity ^0.7.0;
  * @notice A mixin to extend the OpenZeppelin metadata implementation.
  */
 abstract contract NFT721Metadata is NFT721Creator {
+    // using StringsUpgradeable for uint256;
+
+    /**
+     * @dev Stores hashes minted by a creator to prevent duplicates.
+     */
+    mapping(address => mapping(string => bool))
+        private creatorToIPFSHashToMinted;
 
     event BaseURIUpdated(string baseURI);
+    event TokenIPFSPathUpdated(
+        uint256 indexed tokenId,
+        string indexed indexedTokenIPFSPath,
+        string tokenIPFSPath
+    );
+
+    // This event was used in an order version of the contract
+    //event NFTMetadataUpdated(string name, string symbol, string baseURI);
+
+    /**
+     * @notice Returns the IPFSPath to the metadata JSON file for a given NFT.
+     */
+    function getTokenIPFSPath(uint256 tokenId)
+        public
+        view
+        returns (string memory)
+    {
+        return _tokenURIs[tokenId];
+    }
 
     function _updateBaseURI(string memory _baseURI) internal {
         _setBaseURI(_baseURI);
 
         emit BaseURIUpdated(_baseURI);
+    }
+
+    /**
+     * @dev The IPFS path should be the CID + file.extension, e.g.
+     * `QmfPsfGwLhiJrU8t9HpG4wuyjgPo9bk8go4aQqSu9Qg4h7/metadata.json`
+     */
+    function _setTokenIPFSPath(uint256 tokenId, string memory _tokenIPFSPath)
+        internal
+    {
+        // 46 is the minimum length for an IPFS content hash, it may be longer if paths are used
+        require(
+            bytes(_tokenIPFSPath).length >= 46,
+            "NFT721Metadata: Invalid IPFS path"
+        );
+        require(
+            !creatorToIPFSHashToMinted[msg.sender][_tokenIPFSPath],
+            "NFT721Metadata: NFT was already minted"
+        );
+        if (creatorToIPFSHashToMinted[msg.sender][getTokenIPFSPath(tokenId)])
+            creatorToIPFSHashToMinted[msg.sender][
+                getTokenIPFSPath(tokenId)
+            ] = false;
+
+        creatorToIPFSHashToMinted[msg.sender][_tokenIPFSPath] = true;
+        _setTokenURI(tokenId, _tokenIPFSPath);
     }
 
     uint256[999] private ______gap;
@@ -2741,39 +2867,29 @@ abstract contract NFT721Mint is
     NFT721Metadata,
     TreasuryNode
 {
-    using SafeMathUpgradeable for uint256;
     uint256 private nextTokenId;
     mapping(address => bool) public tokenAddress;
-    uint256 internal mintFee;
-    uint256 public deviationPercentage;
-    address public conversionAddress;
+    mapping(address => uint256) public mintFees;
 
     event Minted(
         address indexed creator,
-        address indexed paymentToken,
-        uint256 indexed tokenId
+        uint256 indexed tokenId,
+        string indexed indexedTokenIPFSPath,
+        string tokenIPFSPath
     );
 
-    event BaseTokenAdded(uint256 mintFee);
+    event CollectionDetails(string[] collectionDetails);
 
     event TokenUpdated(address indexed tokenAddress, bool status);
 
     event TokenFeesUpdated(address indexed tokenAddress, uint256 mintFee);
 
-    event DeviationPercentage(uint256 percentage);
     modifier onlyWhitelistedUsers() {
         require(
-            whitelistedAddress[msg.sender] == true || whitelist == false,
+            whiteListedAddress[msg.sender] == true || whiteList == false,
             "NFT721Mint : USER_ADDRESS_NOT_WHITELISTED"
         );
         _;
-    }
-
-    /**
-     * @dev Get USD fee for mint
-     */
-    function getMintFee() public view returns (uint256) {
-        return mintFee;
     }
 
     /**
@@ -2786,6 +2902,29 @@ abstract contract NFT721Mint is
     }
 
     /**
+     * @notice To pay fees.
+     */
+    function _feeCheck(address paymentToken) internal {
+        require(
+            tokenAddress[paymentToken] == true,
+            "NFT721Mint : INVALID_PAYMENT_TOKEN"
+        );
+        if (paymentToken != address(0)) {
+            IERC20(paymentToken).transferFrom(
+                msg.sender,
+                getDropsTreasury(),
+                mintFees[paymentToken]
+            );
+        } else {
+            require(
+                msg.value >= mintFees[paymentToken],
+                "NFT721Mint : INSUFFICIENT_FEE_AMOUNT"
+            );
+            getDropsTreasury().transfer(address(this).balance);
+        }
+    }
+
+    /**
      * @notice To check the date.
      */
     function _dateCheck() internal view {
@@ -2793,35 +2932,6 @@ abstract contract NFT721Mint is
             _startDate <= block.timestamp && block.timestamp <= _endDate,
             "NFT721Mint : MINTING_NOT_LIVE"
         );
-    }
-
-     function checkDeviation(uint256 feeAmount, uint256 price) public view {
-        require(
-            feeAmount >= price.sub((price.mul(deviationPercentage)).div(100)) &&
-                feeAmount <=
-                price.add((price.mul(deviationPercentage)).div(100)),
-            "Amount not within deviation percentage"
-        );
-    }
-
-    function checkMintFees(address paymentToken, uint256 feeAmount) internal {
-        address payable treasury_ = getDropsTreasury();
-        uint256 price = ConversionInt(conversionAddress).convertMintFee(
-            paymentToken,
-            getMintFee()
-        );
-        if (paymentToken != address(0)) {
-            checkDeviation(feeAmount, price);
-            IERC20(paymentToken).transferFrom(
-                msg.sender,
-                getDropsTreasury(),
-                feeAmount
-            );
-        } else {
-            checkDeviation(msg.value, price);
-            (bool success, ) = treasury_.call{value: msg.value}("");
-            require(success, "Transfer failed.");
-        }
     }
 
     /**
@@ -2842,7 +2952,7 @@ abstract contract NFT721Mint is
     /**
      * @notice Allows a creator to mint an NFT.
      */
-    function mint(address paymentToken, uint256 feeAmount)
+    function mint(string memory tokenIPFSPath, address paymentToken)
         public
         payable
         onlyWhitelistedUsers
@@ -2851,23 +2961,19 @@ abstract contract NFT721Mint is
         tokenId = nextTokenId++;
         _supplyCheck(tokenId);
         _dateCheck();
-        checkMintFees(paymentToken, feeAmount);
-        //_feeCheck(paymentToken);
+        _feeCheck(paymentToken);
         _mint(msg.sender, tokenId);
         _updateTokenCreator(tokenId, msg.sender);
-        
-        emit Minted(
-            msg.sender,
-            paymentToken,
-            tokenId
-        );
+        _setTokenIPFSPath(tokenId, tokenIPFSPath);
+        emit Minted(msg.sender, tokenId, tokenIPFSPath, tokenIPFSPath);
     }
-
 
     uint256[1000] private ______gap;
 }
 
 // File contracts/FNDNFT721.sol
+
+pragma experimental ABIEncoderV2;
 
 pragma solidity ^0.7.0;
 
@@ -2896,10 +3002,9 @@ contract LimitedCollection is
         uint256 startDate,
         uint256 endDate,
         bool whitelisted,
-        address controller,
-        address conversion
+        string[] memory collectionDetails
     ) public initializer {
-        Ownable.ownable_init(controller);
+        Ownable.ownable_init();
         NFT721Creator._initializeNFT721Creator();
         NFT721Mint._initializeNFT721Mint();
         TreasuryNode._initializeTreasuryNode(treasury);
@@ -2909,9 +3014,10 @@ contract LimitedCollection is
             supply,
             startDate,
             endDate,
-            whitelisted
+            whitelisted,
+            collectionDetails
         );
-        conversionAddress = conversion;
+        emit CollectionDetails(collectionDetails);
     }
 
     /**
@@ -2922,21 +3028,10 @@ contract LimitedCollection is
         _updateBaseURI(baseURI);
     }
 
-     /**
-     * @notice Allows Admin to set fees.
-     */
-    function adminUpdateFeeAmount(uint256 _mintFee)
-        public
-        onlyOwner
-    {
-        mintFee = _mintFee;
-        emit BaseTokenAdded(_mintFee);
-    }
-
     /**
      * @notice Allows Admin to add token address.
      */
-    function adminUpdateFeeToken(address _tokenAddress, bool status)
+    function adminUpdateToken(address _tokenAddress, bool status)
         public
         onlyOwner
     {
@@ -2945,14 +3040,19 @@ contract LimitedCollection is
     }
 
     /**
-     * @notice Allows Admin to add token address.
+     * @notice Allows Admin to add fees for token address.
      */
-    function adminUpdateDeviation(uint256 _deviationPercentage)
+
+    function adminUpdateFees(address _tokenAddress, uint256 _mintFee)
         public
         onlyOwner
     {
-        deviationPercentage = _deviationPercentage;
-        emit DeviationPercentage(_deviationPercentage);
+        require(
+            tokenAddress[_tokenAddress] == true,
+            "DropsCollection : INVALID_PAYMENT_TOKEN"
+        );
+        mintFees[_tokenAddress] = _mintFee;
+        emit TokenFeesUpdated(_tokenAddress, _mintFee);
     }
 
     /**
@@ -2963,76 +3063,36 @@ contract LimitedCollection is
         address[] memory _whitelistAddresses,
         bool[] memory status
     ) public onlyOwner {
-        require(whitelist == true, "LimitedCollection : PUBLIC_COLLECTION");
+        require(whiteList == true, "DropsCollection : PUBLIC_COLLECTION");
         for (uint256 i = 0; i < _whitelistAddresses.length; i++) {
-            whitelistedAddress[_whitelistAddresses[i]] = status[i];
-            emit Whitelist(_whitelistAddresses[i], status[i]);
+            whiteListedAddress[_whitelistAddresses[i]] = status[i];
+            emit WhiteList(_whitelistAddresses[i], status[i]);
         }
     }
 }
-// File: contracts/limtedCollectionMaster.sol
-
-
-
 
 pragma solidity ^0.7.0;
-pragma experimental ABIEncoderV2;
-pragma solidity ^0.7.0;
-//pragma experimental ABIEncoderV2;
+
 contract LCMaster is Initializable, Ownable {
     address payable treasury;
 
     struct collectionInfo {
-        // the collection name
-        string name;
         // the collection symbol
         string symbol;
-        // the collection quantity
-        uint256 quantity;
-        // the collection startDate
-        uint256 startDate;
-        // the collection endDate
-        uint256 endDate;
-        //whiteList status
-        bool whitelist;
         // the contract address
-        address myContract;
-        // the collection properties
-        string[] attributes;
+        address newCollection;
     }
-
-    struct collectionDetails {
-        // the collection description
-        string description;
-        // the collection image
-        string image;
-        // the collection gender
-        string gender;
-        // the collection category
-        string category;
-        // the collection theme
-        string theme;
-        // the collection grade
-        string grade;
-        // the collection type_
-        string type_;
-    }
-
 
     /**
      * @notice Called once to configure the contract after the initial deployment.
      * @dev This farms the initialize call out to inherited contracts as needed.
      */
-    function initialize(address payable _treasury) public initializer {
-        Ownable.ownable_init(msg.sender);
-        treasury = _treasury;
+    function initialize() public initializer {
+        Ownable.ownable_init();
     }
 
     // collection info mapping
     mapping(address => mapping(string => collectionInfo)) public collections;
-
-    // collection details mapping
-    mapping(address => mapping(string => collectionDetails)) public details;
     // get collection
     mapping(address => mapping(string => address)) public getCollection;
     // get collection code with address
@@ -3041,40 +3101,17 @@ contract LCMaster is Initializable, Ownable {
     event CollectionCreated(
         address creator,
         string colCode,
-        string colName,
-        address myContract,
-        uint256 quantity,
-        uint256 startDate,
-        uint256 endDate,
-        string[] attributes,
-        bool whitelisted
-    );
-
-    event CollectionDetailsAdded(
-        string colCode,
-        string description,
-        string image,
-        string gender,
-        string category,
-        string theme,
-        string grade,
-        string type_
+        address newCollection
     );
 
     /**
      * @notice Allows admin to create a collection.
      */
-    function createCollection(
-        string memory _colCode,
-        string memory _colName,
-        uint256 _colQuantity,
-        uint256 _startDate,
-        uint256 _endDate,
-        bool _whitelist,
-        string[] memory _attributes,
-        address _controller,
-        address _conversionAddress
-    ) external onlyOwner returns (address collection) {
+    function createCollection(string memory _colCode)
+        external
+        onlyOwner
+        returns (address collection)
+    {
         require(
             getCollection[msg.sender][_colCode] == address(0),
             "DropMaster : COLLECTION_EXISTS"
@@ -3089,92 +3126,12 @@ contract LCMaster is Initializable, Ownable {
 
         getCollection[msg.sender][_colCode] = collection;
         getCode[collection] = _colCode;
-        LimitedCollection(collection).initialize(
-            treasury,
-            _colName,
-            _colCode,
-            _colQuantity,
-            _startDate,
-            _endDate,
-            _whitelist,
-            _controller,
-            _conversionAddress
-        );
+
         collections[msg.sender][_colCode] = collectionInfo({
-            name: _colName,
             symbol: _colCode,
-            quantity: _colQuantity,
-            startDate: _startDate,
-            endDate: _endDate,
-            whitelist: _whitelist,
-            myContract: collection,
-            attributes: _attributes
+            newCollection: collection
         });
 
-        emit CollectionCreated(
-            msg.sender,
-            _colCode,
-            _colName,
-            collection,
-            _colQuantity,
-            _startDate,
-            _endDate,
-            _attributes,
-            _whitelist
-        );
-    }
-
-    /**
-     * @notice Function to add the collection details.
-     */
-    function addCollectionDetails(
-        string memory _colCode,
-        string memory _description,
-        string memory _image,
-        string memory _gender,
-        string memory _category,
-        string memory _theme,
-        string memory _grade,
-        string memory _type
-        ) public onlyOwner {
-        
-        details[msg.sender][_colCode] = collectionDetails({
-        description: _description,
-        image: _image,
-        gender: _gender,
-        category: _category,
-        theme: _theme,
-        grade: _grade,
-        type_: _type
-        });
-
-        emit CollectionDetailsAdded(
-            _colCode,
-            _description,
-            _image,
-            _gender,
-            _category,
-            _theme,
-            _grade,
-            _type              
-        );
-        
-    }
-
-    /**
-     * @notice Returns the collection details.
-     */
-    function getCollectionDetails(address user, string memory _code)
-        public
-        view
-        returns (
-            string memory,
-            string memory,
-            uint256,
-            string[] memory
-        )
-    {
-        collectionInfo memory collection = collections[user][_code];
-        return (collection.name, collection.symbol, collection.quantity, collection.attributes);
+        emit CollectionCreated(msg.sender, _colCode, collection);
     }
 }

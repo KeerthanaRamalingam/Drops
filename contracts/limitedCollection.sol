@@ -2965,7 +2965,15 @@ contract limitedCollection is
         uint256 supply,
         uint256 startDate,
         uint256 endDate,
-        bool whitelisted
+        bool whitelisted,
+        string colCode,
+        string description,
+        string image,
+        string gender,
+        string category,
+        string theme,
+        string grade,
+        string type
     ) public initializer {
         Ownable.ownable_init();
         NFT721Creator._initializeNFT721Creator();
