@@ -1744,7 +1744,7 @@ contract ERC721Upgradeable is
     uint256 public deviationPercentage;
 
     // Collection array
-    string[7] internal _collectionDetails;
+    string[9] internal _collectionDetails;
 
     // Collection attributes
     string[] public collectionAttributes;
@@ -1797,7 +1797,7 @@ contract ERC721Upgradeable is
         bool whiteList_,
         address priceConversion_,
         string[] memory attributes_,
-        string[7] memory collectionDetails_
+        string[9] memory collectionDetails_
     ) internal initializer {
         __Context_init_unchained();
         __ERC165_init_unchained();
@@ -1896,7 +1896,9 @@ contract ERC721Upgradeable is
             string memory category,
             string memory theme,
             string memory grade,
-            string memory colType
+            string memory colType,
+            string memory isWardrobeEnabled,
+            string memory wardrobeType
         )
     {
         return (
@@ -1906,7 +1908,9 @@ contract ERC721Upgradeable is
             _collectionDetails[3],
             _collectionDetails[4],
             _collectionDetails[5],
-            _collectionDetails[6]
+            _collectionDetails[6],
+            _collectionDetails[7],
+            _collectionDetails[8]
         );
     }
 
@@ -2507,7 +2511,11 @@ abstract contract NFT721Mint is
 
     event Minted(address indexed creator, uint256 indexed tokenId);
 
-    event CollectionDetails(string symbol, string[7] collectionDetails);
+    event CollectionDetails(
+        string symbol,
+        string[] attributes,
+        string[9] collectionDetails
+    );
 
     event TokenUpdated(address indexed tokenAddress, bool status);
 
@@ -2649,7 +2657,7 @@ contract LimitedCollection is
         bool whitelisted,
         address priceConversion,
         string[] memory attributes,
-        string[7] memory collectionDetails
+        string[9] memory collectionDetails
     ) public initializer {
         Ownable.ownable_init();
         NFT721Creator._initializeNFT721Creator();
@@ -2666,7 +2674,7 @@ contract LimitedCollection is
             attributes,
             collectionDetails
         );
-        emit CollectionDetails(symbol, collectionDetails);
+        emit CollectionDetails(symbol, attributes, collectionDetails);
     }
 
     /**

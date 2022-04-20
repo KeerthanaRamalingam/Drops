@@ -59,35 +59,31 @@ async function main() {
     await conversion.addToken(MATIC, PRICE_MATIC_USD);
 
     await new Promise(res => setTimeout(res, 5000));
-
     await conversion.addToken(USDC, PRICE_USDC_USD);
 
     await new Promise(res => setTimeout(res, 5000));
-
     await conversion.addToken(USDT, PRICE_USDT_USD);
 
     const collection = await ethers.getContractFactory('LimitedCollection');
     const collectionInstance = await collection.attach(Collection);
-    await collectionInstance.initialize(treasuryProxy.address, "DROPS", "101", 20, startTime, endTime, true, conversion.address, ["Size", "Color", "Gender"], ["description", "image", "gender", "category", "theme", "grade", "type_"]);
+    await collectionInstance.initialize(treasuryProxy.address, "DROPS", "101", 20, startTime, endTime, true, conversion.address, ["Size", "Color", "Gender"], ["description", "image", "gender", "category", "theme", "grade", "type_, yes, wardrobeType"]);
     await new Promise(res => setTimeout(res, 5000));
 
 
     console.log("Owner", await collectionInstance.owner());
-    //// ************ ADD TOKEN TO BUDDY **************/////
-    await new Promise(res => setTimeout(res, 5000));
 
+    //// ************ ADD TOKEN TO Collection **************/////
+    
+    await new Promise(res => setTimeout(res, 5000));
     await collectionInstance.adminUpdateFeeToken(MATIC, true); // Matic
 
     await new Promise(res => setTimeout(res, 5000));
-
     await collectionInstance.adminUpdateFeeToken(USDT, true); // USDT
 
     await new Promise(res => setTimeout(res, 5000));
-
     await collectionInstance.adminUpdateFeeToken(USDC, true); // USDC
 
     await new Promise(res => setTimeout(res, 5000));
-
     console.log("Supported token", await collectionInstance.tokenAddress(MATIC));
 
     await collectionInstance.adminUpdateFees(mintFee);
@@ -97,7 +93,6 @@ async function main() {
 
     await collectionInstance.updateWhitelist([accounts[0]], [true]);
     await new Promise(res => setTimeout(res, 5000));
-
 
     await collectionInstance.adminUpdateBaseURI("https://ipfs.io/ipfs/");
     await new Promise(res => setTimeout(res, 5000));
@@ -111,7 +106,7 @@ async function main() {
     console.log("Price", price);
 
     console.log("Next token ID", await collectionInstance.getNextTokenId());
-    await collectionInstance.mint("0x0000000000000000000000000000000000000000", 0, {
+    await collectionInstance.mint(MATIC, 0, {
         value: price
     });
     await new Promise(res => setTimeout(res, 5000));
