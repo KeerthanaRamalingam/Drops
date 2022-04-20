@@ -1744,7 +1744,10 @@ contract ERC721Upgradeable is
     uint256 public deviationPercentage;
 
     // Collection array
-    string[] internal _collectionDetails;
+    string[7] internal _collectionDetails;
+
+    // Collection attributes
+    string[] public collectionAttributes;
 
     /*
      *     bytes4(keccak256('balanceOf(address)')) == 0x70a08231
@@ -1793,7 +1796,8 @@ contract ERC721Upgradeable is
         uint256 endDate_,
         bool whiteList_,
         address priceConversion_,
-        string[] memory collectionDetails_
+        string[] memory attributes_,
+        string[7] memory collectionDetails_
     ) internal initializer {
         __Context_init_unchained();
         __ERC165_init_unchained();
@@ -1803,6 +1807,7 @@ contract ERC721Upgradeable is
         whiteList = whiteList_;
         priceConversion = priceConversion_;
         _collectionDetails = collectionDetails_;
+        collectionAttributes = attributes_;
     }
 
     function _updateSupply(uint256 supply_) internal {
@@ -2502,7 +2507,7 @@ abstract contract NFT721Mint is
 
     event Minted(address indexed creator, uint256 indexed tokenId);
 
-    event CollectionDetails(string[] collectionDetails);
+    event CollectionDetails(string symbol, string[7] collectionDetails);
 
     event TokenUpdated(address indexed tokenAddress, bool status);
 
@@ -2643,7 +2648,8 @@ contract LimitedCollection is
         uint256 endDate,
         bool whitelisted,
         address priceConversion,
-        string[] memory collectionDetails
+        string[] memory attributes,
+        string[7] memory collectionDetails
     ) public initializer {
         Ownable.ownable_init();
         NFT721Creator._initializeNFT721Creator();
@@ -2657,9 +2663,10 @@ contract LimitedCollection is
             endDate,
             whitelisted,
             priceConversion,
+            attributes,
             collectionDetails
         );
-        emit CollectionDetails(collectionDetails);
+        emit CollectionDetails(symbol, collectionDetails);
     }
 
     /**

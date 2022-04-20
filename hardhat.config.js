@@ -93,10 +93,10 @@ module.exports = {
         },
       },
     ],
-    overrides: {
-      "contracts/limitedCollection.sol": {
-        version: "0.7.0",
-      }
-    }
+    // overrides: {
+    //   "contracts/limitedCollection.sol": {
+    //     version: "0.7.0",
+    //   }
+    // }
   }
 }
