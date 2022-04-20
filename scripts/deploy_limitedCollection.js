@@ -4,9 +4,25 @@ async function main() {
     const accounts = await ethers.provider.listAccounts();
     console.log("Accounts", accounts[0]);
 
+    const USDT = "0xF2fE21E854c838C66579f62Ba0a60CA84367cd8F"
+    const USDC = "0xb0040280A0C97F20C92c09513b8C6e6Ff9Aa86DC"
+    const MATIC = "0x0000000000000000000000000000000000000000"
+
+    // Mainnet
+    // const PRICE_MATIC_USD = "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0"
+    // const PRICE_USDT_USD = "0x0A6513e40db6EB1b165753AD52E80663aeA50545";
+    // const PRICE_USDC_USD = "0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7";
+
+    const PRICE_MATIC_USD = "0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada"
+    const PRICE_USDT_USD = "0x92C09849638959196E976289418e5973CC96d645";
+    const PRICE_USDC_USD = "0x572dDec9087154dC5dfBB1546Bb62713147e0Ab0";
+
+    const mintFee = 100000000;
+
     const dropsTreasury = await ethers.getContractFactory("Treasury");
     const treasuryProxy = await upgrades.deployProxy(dropsTreasury, [accounts[0]], { initializer: 'initialize' })
     await new Promise(res => setTimeout(res, 5000));
+
     console.log("Treasury proxy", treasuryProxy.address);
     console.log("Is admin", await treasuryProxy.isAdmin(accounts[0]));
 
@@ -21,12 +37,13 @@ async function main() {
     const LimitedCollection = await ethers.getContractFactory("LCMaster")
     const LimitedCollectionProxy = await upgrades.deployProxy(LimitedCollection, { initializer: 'initialize' });
     await new Promise(res => setTimeout(res, 5000));
+
     console.log("Owner", await LimitedCollectionProxy.owner());
     console.log("LimitedCollectionProxy:", LimitedCollectionProxy.address);
 
     await LimitedCollectionProxy.createCollection("101");
     await new Promise(res => setTimeout(res, 5000));
-    console.log(await LimitedCollectionProxy.collections("0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266", "101"));
+
     const Collection = await LimitedCollectionProxy.getCollection(accounts[0], "101");
     console.log("Collection Address", Collection);
 
@@ -35,35 +52,71 @@ async function main() {
     const Conversion = await ethers.getContractFactory("Conversion");
     const conversion = await upgrades.deployProxy(Conversion, { initializer: 'initialize' })
     await new Promise(res => setTimeout(res, 5000));
+
     console.log("conversion proxy", conversion.address);
+
+    await new Promise(res => setTimeout(res, 5000));
+    await conversion.addToken(MATIC, PRICE_MATIC_USD);
+
+    await new Promise(res => setTimeout(res, 5000));
+
+    await conversion.addToken(USDC, PRICE_USDC_USD);
+
+    await new Promise(res => setTimeout(res, 5000));
+
+    await conversion.addToken(USDT, PRICE_USDT_USD);
 
     const collection = await ethers.getContractFactory('LimitedCollection');
     const collectionInstance = await collection.attach(Collection);
-    console.log("Owner", await collectionInstance.owner());
-    await new Promise(res => setTimeout(res, 5000));
     await collectionInstance.initialize(treasuryProxy.address, "DROPS", "101", 20, startTime, endTime, true, conversion.address, ["Size", "Color", "Gender"], ["description", "image", "gender", "category", "theme", "grade", "type_"]);
+    await new Promise(res => setTimeout(res, 5000));
+
+
+    console.log("Owner", await collectionInstance.owner());
+    //// ************ ADD TOKEN TO BUDDY **************/////
+    await new Promise(res => setTimeout(res, 5000));
+
+    await collectionInstance.adminUpdateFeeToken(MATIC, true); // Matic
 
     await new Promise(res => setTimeout(res, 5000));
-    await collectionInstance.adminUpdateToken("0x0000000000000000000000000000000000000000", true);
-    await new Promise(res => setTimeout(res, 5000));
-    console.log("Supported token", await collectionInstance.tokenAddress("0x0000000000000000000000000000000000000000"));
 
-    await collectionInstance.adminUpdateFees(100000000);
+    await collectionInstance.adminUpdateFeeToken(USDT, true); // USDT
+
     await new Promise(res => setTimeout(res, 5000));
-    console.log("Mint fee", await collectionInstance.mintFee());
+
+    await collectionInstance.adminUpdateFeeToken(USDC, true); // USDC
+
+    await new Promise(res => setTimeout(res, 5000));
+
+    console.log("Supported token", await collectionInstance.tokenAddress(MATIC));
+
+    await collectionInstance.adminUpdateFees(mintFee);
+    await new Promise(res => setTimeout(res, 5000));
+
+    console.log("Mint fee", await collectionInstance.getMintFee());
 
     await collectionInstance.updateWhitelist([accounts[0]], [true]);
     await new Promise(res => setTimeout(res, 5000));
 
+
     await collectionInstance.adminUpdateBaseURI("https://ipfs.io/ipfs/");
     await new Promise(res => setTimeout(res, 5000));
 
-    // console.log("Next token ID", await collectionInstance.getNextTokenId());
-    // await collectionInstance.mint("QmQh36CsceXZoqS7v9YQLUyxXdRmWd8YWTBUz7WCXsiVty", "0x0000000000000000000000000000000000000000", ["test"], ["test"], {
-    //     value: 1000000000000000
-    // });
-    // await new Promise(res => setTimeout(res, 5000));
-    // console.log("Next token ID", await collectionInstance.getNextTokenId());
+
+    await new Promise(res => setTimeout(res, 5000));
+
+    await collectionInstance.adminUpdateDeviation(5);
+
+    var price = await conversion.convertMintFee(MATIC, mintFee);
+    console.log("Price", price);
+
+    console.log("Next token ID", await collectionInstance.getNextTokenId());
+    await collectionInstance.mint("0x0000000000000000000000000000000000000000", 0, {
+        value: price
+    });
+    await new Promise(res => setTimeout(res, 5000));
+
+    console.log("Next token ID", await collectionInstance.getNextTokenId());
 }
 
 main()

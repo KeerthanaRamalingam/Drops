@@ -2680,7 +2680,7 @@ contract LimitedCollection is
     /**
      * @notice Allows Admin to add token address.
      */
-    function adminUpdateToken(address _tokenAddress, bool status)
+    function adminUpdateFeeToken(address _tokenAddress, bool status)
         public
         onlyOwner
     {
@@ -2776,6 +2776,8 @@ contract LCMaster is Initializable, Ownable {
         assembly {
             collection := create2(0, add(bytecode, 32), mload(bytecode), salt)
         }
+
+        require(collection != address(0), "Collection creation ?");
 
         getCollection[msg.sender][_colCode] = collection;
         getCode[collection] = _colCode;

@@ -19,7 +19,7 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 const MAINNET_RPC_URL = "https://polygon-rpc.com/"
 const MAINNET_PRIVATE_KEY = process.env.MAINNET_PRIVATE_KEY;
 
-const MUMBAI_RPC_URL = "https://matic-mumbai.chainstacklabs.com";
+const MUMBAI_RPC_URL = "https://rpc-mumbai.maticvigil.com";
 const MUMBAI_PRIVATE_KEY = process.env.MUMBAI_PRIVATE_KEY;
 
 const ROPSTEN_RPC_URL = "https://ropsten.infura.io/v3/9fe1548079c34c6ca0cd0a99d316a91d";

@@ -593,6 +593,7 @@ contract Conversion is Initializable {
         returns (uint256)
     {
         (, int256 _price, , , ) = fetchPrice.latestRoundData();
+        // int256 _price = 143803233;
         uint256 price = uint256(_price).mul(1E10);
         return price;
     }
