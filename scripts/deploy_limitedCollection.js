@@ -66,14 +66,14 @@ async function main() {
 
     const collection = await ethers.getContractFactory('LimitedCollection');
     const collectionInstance = await collection.attach(Collection);
-    await collectionInstance.initialize(treasuryProxy.address, "DROPS", "101", 20, startTime, endTime, true, conversion.address, ["Size", "Color", "Gender"], ["description", "image", "gender", "category", "theme", "grade", "type_, yes, wardrobeType"]);
+    await collectionInstance.initialize(treasuryProxy.address, "DROPS", "101", 20, startTime, endTime, true, conversion.address, ["Size", "Color", "Gender"], ["description", "image", "gender", "category", "theme", "grade", "type", "yes", "wardrobeType"]);
     await new Promise(res => setTimeout(res, 5000));
 
 
     console.log("Owner", await collectionInstance.owner());
 
     //// ************ ADD TOKEN TO Collection **************/////
-    
+
     await new Promise(res => setTimeout(res, 5000));
     await collectionInstance.adminUpdateFeeToken(MATIC, true); // Matic
 
