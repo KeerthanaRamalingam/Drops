@@ -537,10 +537,6 @@ interface IERC721MetadataUpgradeable is IERC721Upgradeable {
      */
     function symbol() external view returns (string memory);
 
-    /**
-     * @dev Returns the Uniform Resource Identifier (URI) for `tokenId` token.
-     */
-    function tokenURI(uint256 tokenId) external view returns (string memory);
 }
 
 // File @openzeppelin/contracts-upgradeable/token/ERC721/IERC721EnumerableUpgradeable.sol@v3.4.1-solc-0.7
@@ -1719,9 +1715,6 @@ contract ERC721Upgradeable is
     // Token symbol
     string private _symbol;
 
-    // Optional mapping for token URIs
-    mapping(uint256 => string) internal _tokenURIs;
-
     // Token totalSupply
     uint256 internal _supply;
 
@@ -1742,6 +1735,10 @@ contract ERC721Upgradeable is
 
     // Deviation Percentage
     uint256 public deviationPercentage;
+
+    //attributes array
+    string[] internal _attributes;
+
 
     // Collection array
     string[] internal _collectionDetails;
@@ -1791,6 +1788,7 @@ contract ERC721Upgradeable is
         uint256 supply_,
         uint256 startDate_,
         uint256 endDate_,
+        string[] memory attributes,
         bool whiteList_,
         address priceConversion_,
         string[] memory collectionDetails_
@@ -1800,6 +1798,7 @@ contract ERC721Upgradeable is
         __ERC721_init_unchained(name_, symbol_);
         _updateSupply(supply_);
         _setTime(startDate_, endDate_);
+        _attributes = attributes;
         whiteList = whiteList_;
         priceConversion = priceConversion_;
         _collectionDetails = collectionDetails_;
@@ -1905,32 +1904,8 @@ contract ERC721Upgradeable is
         );
     }
 
-    /**
-     * @dev See {IERC721Metadata-tokenURI}.
-     */
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        override
-        returns (string memory)
-    {
-        require(
-            _exists(tokenId),
-            "ERC721Metadata: URI query for nonexistent token"
-        );
-
-        string memory _tokenURI = _tokenURIs[tokenId];
-
-        // If there is no base URI, return the token URI.
-        if (bytes(_baseURI).length == 0) {
-            return _tokenURI;
-        }
-        // If both are set, concatenate the baseURI and tokenURI (via abi.encodePacked).
-        if (bytes(_tokenURI).length > 0) {
-            return string(abi.encodePacked(_baseURI, _tokenURI));
-        }
-        // If there is a baseURI but no tokenURI, concatenate the tokenID to the baseURI.
-        return string(abi.encodePacked(_baseURI, tokenId.toString()));
+    function getAttribute() public view returns(string[] memory) {
+        return _attributes;
     }
 
     /**
@@ -2216,9 +2191,9 @@ contract ERC721Upgradeable is
         _approve(address(0), tokenId);
 
         // Clear metadata (if any)
-        if (bytes(_tokenURIs[tokenId]).length != 0) {
+        /*if (bytes(_tokenURIs[tokenId]).length != 0) {
             delete _tokenURIs[tokenId];
-        }
+        }*/
 
         _holderTokens[owner].remove(tokenId);
 
@@ -2261,24 +2236,6 @@ contract ERC721Upgradeable is
         _tokenOwners.set(tokenId, to);
 
         emit Transfer(from, to, tokenId);
-    }
-
-    /**
-     * @dev Sets `_tokenURI` as the tokenURI of `tokenId`.
-     *
-     * Requirements:
-     *
-     * - `tokenId` must exist.
-     */
-    function _setTokenURI(uint256 tokenId, string memory _tokenURI)
-        internal
-        virtual
-    {
-        require(
-            _exists(tokenId),
-            "ERC721Metadata: URI set of nonexistent token"
-        );
-        _tokenURIs[tokenId] = _tokenURI;
     }
 
     /**
@@ -2498,11 +2455,12 @@ abstract contract NFT721Mint is
     using SafeMathUpgradeable for uint256;
     uint256 private nextTokenId;
     mapping(address => bool) public tokenAddress;
+
     uint256 internal mintFee;
 
     event Minted(address indexed creator, uint256 indexed tokenId);
 
-    event CollectionDetails(string[] collectionDetails);
+    event CollectionDetails(string symbol, string[] collectionDetails);
 
     event TokenUpdated(address indexed tokenAddress, bool status);
 
@@ -2641,6 +2599,7 @@ contract LimitedCollection is
         uint256 supply,
         uint256 startDate,
         uint256 endDate,
+        string[] memory attributes,
         bool whitelisted,
         address priceConversion,
         string[] memory collectionDetails
@@ -2655,11 +2614,12 @@ contract LimitedCollection is
             supply,
             startDate,
             endDate,
+            attributes,
             whitelisted,
             priceConversion,
             collectionDetails
         );
-        emit CollectionDetails(collectionDetails);
+        emit CollectionDetails(symbol,collectionDetails);
     }
 
     /**
