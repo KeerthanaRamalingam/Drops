@@ -1,3 +1,7 @@
+/**
+ *Submitted for verification at polygonscan.com on 2022-04-20
+*/
+
 // SPDX-License-Identifier: UNLICENSED
 // File: contracts/Collection.sol
 
@@ -121,6 +125,17 @@ interface IERC20 {
         uint256 value
     );
 }
+interface NftContract {
+
+  function transferFrom(
+        address from,
+        address to,
+        uint256 tokenId
+    ) external;
+
+    function ownerOf(uint256 tokenId) external view returns (address owner);
+}
+
 
 /**
  * @dev Interface of the Price conversion contract
@@ -2507,6 +2522,7 @@ abstract contract NFT721Mint is
     using SafeMathUpgradeable for uint256;
     uint256 private nextTokenId;
     mapping(address => bool) public tokenAddress;
+    mapping(address => bool) public NftAddress;
     uint256 internal mintFee;
 
     event Minted(address indexed creator, uint256 indexed tokenId);
@@ -2518,6 +2534,9 @@ abstract contract NFT721Mint is
     );
 
     event TokenUpdated(address indexed tokenAddress, bool status);
+
+    event NftAddressUpdated(address indexed nftAddress, bool status);
+
 
     event TokenFeesUpdated(uint256 mintFee);
 
@@ -2607,18 +2626,27 @@ abstract contract NFT721Mint is
     /**
      * @notice Allows a creator to mint an NFT.
      */
-    function mint(address paymentToken, uint256 feeAmount)
+    function mint(address paymentToken, uint256 feeAmount, string memory _type)
         public
         payable
         onlyWhitelistedUsers
         returns (uint256 tokenId)
     {
-        tokenId = nextTokenId++;
-        checkSupply(tokenId);
-        checkDate();
-        checkMintFees(paymentToken, feeAmount);
-        _mint(msg.sender, tokenId);
-        _updateTokenCreator(tokenId, msg.sender);
+        if(keccak256(abi.encodePacked((_type))) == keccak256(abi.encodePacked(("erc20")))) 
+        {
+            require(tokenAddress[paymentToken] == true,"NFT721Mint : PaymentToken Not Supported");
+            tokenId = nextTokenId++;
+            checkSupply(tokenId);
+            checkDate();
+            checkMintFees(paymentToken, feeAmount);
+            _mint(msg.sender, tokenId);
+            _updateTokenCreator(tokenId, msg.sender);
+        }
+        else if(keccak256(abi.encodePacked((_type))) == keccak256(abi.encodePacked(("erc721")))) {
+            require(NftAddress[paymentToken] == true, "NFT721Mint : PaymentToken Not Supported");
+            require(msg.sender == NftContract(paymentToken).ownerOf(feeAmount), "NFT721Mint : Caller is not the owner");
+            NftContract(paymentToken).transferFrom(msg.sender, getDropsTreasury(), feeAmount);
+        }
         emit Minted(msg.sender, tokenId);
     }
 
@@ -2714,6 +2742,14 @@ contract LimitedCollection is
     {
         deviationPercentage = _deviationPercentage;
         emit DeviationPercentage(_deviationPercentage);
+    }
+
+    /** 
+     * @notice Allows Admin to add nft address.
+     */
+    function addNftAddress(address _nftAddress, bool status) public onlyOwner{
+        NftAddress[_nftAddress] = status;
+        emit NftAddressUpdated(_nftAddress, status);
     }
 
     /**
