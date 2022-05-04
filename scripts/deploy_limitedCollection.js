@@ -31,8 +31,8 @@ async function main() {
     const blockNumBefore = await ethers.provider.getBlockNumber();
     const blockBefore = await ethers.provider.getBlock(blockNumBefore);
     const startTime = blockBefore.timestamp;
-    const sevenDays = 7 * 24 * 60 * 60;
-    const endTime = startTime + sevenDays;
+    const tenDays = 10 * 24 * 60 * 60;
+    const endTime = startTime + tenDays;
 
     const LimitedCollection = await ethers.getContractFactory("LCMaster")
     const LimitedCollectionProxy = await upgrades.deployProxy(LimitedCollection, { initializer: 'initialize' });
@@ -66,7 +66,7 @@ async function main() {
 
     const collection = await ethers.getContractFactory('LimitedCollection');
     const collectionInstance = await collection.attach(Collection);
-    await collectionInstance.initialize(treasuryProxy.address, "DROPS", "101", 20, startTime, endTime, true, conversion.address, ["Size", "Color", "Gender"], ["description", "image", "gender", "category", "theme", "grade", "type", "yes", "wardrobeType"]);
+    await collectionInstance.initialize(treasuryProxy.address, "Prime Collection ETH mainnet - 02 - Kiddo Monkeys 14919", "101", 20, startTime, endTime, true, conversion.address, ["Size", "Color", "Gender","Category","Theme","Style"], ["NFTs are unique cryptographic tokens that exist on a blockchain and cannot be replica", "https://ipfs.io/ipfs/QmRECTS8gSXLbRgomsrvi7nY6x2SCVPER4f1jSUxWpxaRu/nft.jpg", "Male", "Art & Gaming", "Pixel Art 2022", "prime", "drops", "true", "outfit"]);
     await new Promise(res => setTimeout(res, 5000));
 
 
@@ -94,7 +94,7 @@ async function main() {
     await collectionInstance.updateWhitelist([accounts[0]], [true]);
     await new Promise(res => setTimeout(res, 5000));
 
-    await collectionInstance.adminUpdateBaseURI("https://ipfs.io/ipfs/");
+    await collectionInstance.adminUpdateBaseURI("https://ipfs.io/ipfs/QmRXAz562Lq9n5mFCF24Jm84y5AYiDbgG4nqaQeMN4A4Jx/");
     await new Promise(res => setTimeout(res, 5000));
 
 
