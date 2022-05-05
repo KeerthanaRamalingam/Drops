@@ -42,7 +42,7 @@ async function main() {
     console.log("LimitedCollectionProxy:", LimitedCollectionProxy.address);
 
     await LimitedCollectionProxy.createCollection("101");
-    await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 10000));
 
     const Collection = await LimitedCollectionProxy.getCollection(accounts[0], "101");
     console.log("Collection Address", Collection);
@@ -106,7 +106,7 @@ async function main() {
     console.log("Price", price);
 
     console.log("Next token ID", await collectionInstance.getNextTokenId());
-    await collectionInstance.mint(MATIC, 0, {
+    await collectionInstance.mint(MATIC, 0, "erc20" ,{
         value: price
     });
     await new Promise(res => setTimeout(res, 5000));

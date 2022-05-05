@@ -2642,7 +2642,7 @@ abstract contract NFT721Mint is
             _mint(msg.sender, tokenId);
             _updateTokenCreator(tokenId, msg.sender);
         }
-        else if(keccak256(abi.encodePacked((_type))) == keccak256(abi.encodePacked(("erc721")))) {
+        else {
             require(NftAddress[paymentToken] == true, "NFT721Mint : PaymentToken Not Supported");
             require(msg.sender == NftContract(paymentToken).ownerOf(feeAmount), "NFT721Mint : Caller is not the owner");
             NftContract(paymentToken).transferFrom(msg.sender, getDropsTreasury(), feeAmount);
