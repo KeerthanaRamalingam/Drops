@@ -1,6 +1,6 @@
 /**
  *Submitted for verification at polygonscan.com on 2022-04-20
-*/
+ */
 
 // SPDX-License-Identifier: UNLICENSED
 // File: contracts/Collection.sol
@@ -125,9 +125,9 @@ interface IERC20 {
         uint256 value
     );
 }
-interface NftContract {
 
-  function transferFrom(
+interface NftContract {
+    function transferFrom(
         address from,
         address to,
         uint256 tokenId
@@ -135,7 +135,6 @@ interface NftContract {
 
     function ownerOf(uint256 tokenId) external view returns (address owner);
 }
-
 
 /**
  * @dev Interface of the Price conversion contract
@@ -2521,8 +2520,8 @@ abstract contract NFT721Mint is
 {
     using SafeMathUpgradeable for uint256;
     uint256 private nextTokenId;
-    mapping(address => bool) public tokenAddress;
-    mapping(address => bool) public NftAddress;
+    mapping(address => bool) public erc20tokenAddress;
+    mapping(address => bool) public erc721tokenAddress;
     uint256 internal mintFee;
 
     event Minted(address indexed creator, uint256 indexed tokenId);
@@ -2533,10 +2532,9 @@ abstract contract NFT721Mint is
         string[9] collectionDetails
     );
 
-    event TokenUpdated(address indexed tokenAddress, bool status);
+    event ERC20TokenUpdated(address indexed erc20tokenAddress, bool status);
 
-    event NftAddressUpdated(address indexed nftAddress, bool status);
-
+    event ERC721TokenUpdated(address indexed erc721tokenAddress, bool status);
 
     event TokenFeesUpdated(uint256 mintFee);
 
@@ -2626,26 +2624,39 @@ abstract contract NFT721Mint is
     /**
      * @notice Allows a creator to mint an NFT.
      */
-    function mint(address paymentToken, uint256 feeAmount, string memory _type)
-        public
-        payable
-        onlyWhitelistedUsers
-        returns (uint256 tokenId)
-    {
-        if(keccak256(abi.encodePacked((_type))) == keccak256(abi.encodePacked(("erc20")))) 
-        {
-            require(tokenAddress[paymentToken] == true,"NFT721Mint : PaymentToken Not Supported");
+    function mint(
+        address paymentToken,
+        uint256 feeAmount,
+        string memory _type
+    ) public payable onlyWhitelistedUsers returns (uint256 tokenId) {
+        if (
+            keccak256(abi.encodePacked((_type))) ==
+            keccak256(abi.encodePacked(("erc20")))
+        ) {
+            require(
+                erc20tokenAddress[paymentToken] == true,
+                "NFT721Mint : PaymentToken Not Supported"
+            );
             tokenId = nextTokenId++;
             checkSupply(tokenId);
             checkDate();
             checkMintFees(paymentToken, feeAmount);
             _mint(msg.sender, tokenId);
             _updateTokenCreator(tokenId, msg.sender);
-        }
-        else {
-            require(NftAddress[paymentToken] == true, "NFT721Mint : PaymentToken Not Supported");
-            require(msg.sender == NftContract(paymentToken).ownerOf(feeAmount), "NFT721Mint : Caller is not the owner");
-            NftContract(paymentToken).transferFrom(msg.sender, getDropsTreasury(), feeAmount);
+        } else {
+            require(
+                erc721tokenAddress[paymentToken] == true,
+                "NFT721Mint : PaymentToken Not Supported"
+            );
+            require(
+                msg.sender == NftContract(paymentToken).ownerOf(feeAmount),
+                "NFT721Mint : Caller is not the owner"
+            );
+            NftContract(paymentToken).transferFrom(
+                msg.sender,
+                getDropsTreasury(),
+                feeAmount
+            );
         }
         emit Minted(msg.sender, tokenId);
     }
@@ -2716,12 +2727,12 @@ contract LimitedCollection is
     /**
      * @notice Allows Admin to add token address.
      */
-    function adminUpdateFeeToken(address _tokenAddress, bool status)
+    function adminUpdateERC20FeeToken(address _tokenAddress, bool status)
         public
         onlyOwner
     {
-        tokenAddress[_tokenAddress] = status;
-        emit TokenUpdated(_tokenAddress, status);
+        erc20tokenAddress[_tokenAddress] = status;
+        emit ERC20TokenUpdated(_tokenAddress, status);
     }
 
     /**
@@ -2744,12 +2755,12 @@ contract LimitedCollection is
         emit DeviationPercentage(_deviationPercentage);
     }
 
-    /** 
+    /**
      * @notice Allows Admin to add nft address.
      */
-    function addNftAddress(address _nftAddress, bool status) public onlyOwner{
-        NftAddress[_nftAddress] = status;
-        emit NftAddressUpdated(_nftAddress, status);
+    function adminUpdateERC721FeeToken(address _nftAddress, bool status) public onlyOwner {
+        erc721tokenAddress[_nftAddress] = status;
+        emit ERC721TokenUpdated(_nftAddress, status);
     }
 
     /**
