@@ -3,19 +3,25 @@ const { ethers } = require("hardhat")
 async function main() {
     const accounts = await ethers.provider.listAccounts();
     console.log("Accounts", accounts[0]);
-
-    const USDT = "0xF2fE21E854c838C66579f62Ba0a60CA84367cd8F"
+    //Testnet Tokens
+    /*const USDT = "0xF2fE21E854c838C66579f62Ba0a60CA84367cd8F"
     const USDC = "0xb0040280A0C97F20C92c09513b8C6e6Ff9Aa86DC"
+    const MATIC = "0x0000000000000000000000000000000000000000"*/
+
+    //Mainnet Tokens
+    const USDT = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F"
+    const USDC = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
     const MATIC = "0x0000000000000000000000000000000000000000"
 
-    // Mainnet
-    // const PRICE_MATIC_USD = "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0"
-    // const PRICE_USDT_USD = "0x0A6513e40db6EB1b165753AD52E80663aeA50545";
-    // const PRICE_USDC_USD = "0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7";
+    // Mainnet Conversion
+     const PRICE_MATIC_USD = "0xAB594600376Ec9fD91F8e885dADF0CE036862dE0"
+     const PRICE_USDT_USD = "0x0A6513e40db6EB1b165753AD52E80663aeA50545";
+     const PRICE_USDC_USD = "0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7";
 
-    const PRICE_MATIC_USD = "0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada"
+    //Testnet Conversion 
+    /*const PRICE_MATIC_USD = "0xd0D5e3DB44DE05E9F294BB0a3bEEaF030DE24Ada"
     const PRICE_USDT_USD = "0x92C09849638959196E976289418e5973CC96d645";
-    const PRICE_USDC_USD = "0x572dDec9087154dC5dfBB1546Bb62713147e0Ab0";
+    const PRICE_USDC_USD = "0x572dDec9087154dC5dfBB1546Bb62713147e0Ab0";*/
 
     const mintFee = 100000000;
 
@@ -31,8 +37,8 @@ async function main() {
     const blockNumBefore = await ethers.provider.getBlockNumber();
     const blockBefore = await ethers.provider.getBlock(blockNumBefore);
     const startTime = blockBefore.timestamp;
-    const tenDays = 10 * 24 * 60 * 60;
-    const endTime = startTime + tenDays;
+    const thirtyDays = 30 * 24 * 60 * 60;
+    const endTime = startTime + thirtyDays;
 
     const LimitedCollection = await ethers.getContractFactory("LCMaster")
     const LimitedCollectionProxy = await upgrades.deployProxy(LimitedCollection, { initializer: 'initialize' });
@@ -66,6 +72,7 @@ async function main() {
 
     const collection = await ethers.getContractFactory('LimitedCollection');
     const collectionInstance = await collection.attach(Collection);
+    
     await collectionInstance.initialize(treasuryProxy.address, "Prime Collection ETH mainnet - 02 - Kiddo Monkeys 14919", "101", 20, startTime, endTime, true, conversion.address, ["Size", "Color", "Gender","Category","Theme","Style"], ["NFTs are unique cryptographic tokens that exist on a blockchain and cannot be replica", "https://ipfs.io/ipfs/QmRECTS8gSXLbRgomsrvi7nY6x2SCVPER4f1jSUxWpxaRu/nft.jpg", "Male", "Art & Gaming", "Pixel Art 2022", "prime", "drops", "true", "outfit"]);
     await new Promise(res => setTimeout(res, 5000));
 
