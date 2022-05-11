@@ -706,7 +706,7 @@ interface QuickswapPair {
         );
 }
 
-contract Conversion is Initializable, Ownable {
+contract ConversionV1 is Initializable, Ownable {
     using SafeMathUpgradeable for uint256;
     address internal USX;
     address internal Trace;
