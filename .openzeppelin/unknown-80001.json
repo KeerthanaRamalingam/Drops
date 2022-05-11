@@ -7,6 +7,10 @@
     {
       "address": "0x8a11870DCCb2CA0b85ceC01B13B401a93c76fA9F",
       "kind": "transparent"
+    },
+    {
+      "address": "0xA0e255CD8759138a92e487267657521d9F5570e9",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -281,6 +285,193 @@
               }
             ],
             "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        }
+      }
+    },
+    "5db17971e06e9bb59094a9d294fd622f7ff215d1b4711afdada79cc305b49c94": {
+      "address": "0xE7f309C7893759113aD10835585a55A9Cab9Bf95",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\conversion.sol:309"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\conversion.sol:314"
+          },
+          {
+            "label": "admin",
+            "offset": 2,
+            "slot": "0",
+            "type": "t_address",
+            "contract": "Conversion",
+            "src": "contracts\\conversion.sol:581"
+          },
+          {
+            "label": "USDDecimals",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint256",
+            "contract": "Conversion",
+            "src": "contracts\\conversion.sol:582"
+          },
+          {
+            "label": "priceFeed",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_address))",
+            "contract": "Conversion",
+            "src": "contracts\\conversion.sol:583"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_address)": {
+            "label": "mapping(address => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_address))": {
+            "label": "mapping(address => mapping(address => address))",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        }
+      }
+    },
+    "a16c986bfe1aa29ad117a6fc306d947f8238ec6d1ed39ecf1da316ba87714b2e": {
+      "address": "0x789039D95969910699C5C45977676Dd41F3Dbd0c",
+      "txHash": "0x17d776e3156deea00b3da685a9486c70a9b46940ff9b0c8b6ba1f018e7b0c384",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\ConversionV1.sol:302"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\ConversionV1.sol:307"
+          },
+          {
+            "label": "admin",
+            "offset": 2,
+            "slot": "0",
+            "type": "t_address",
+            "contract": "ConversionV1",
+            "src": "contracts\\ConversionV1.sol:713"
+          },
+          {
+            "label": "USDDecimals",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint256",
+            "contract": "ConversionV1",
+            "src": "contracts\\ConversionV1.sol:718"
+          },
+          {
+            "label": "priceFeed",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_address))",
+            "contract": "ConversionV1",
+            "src": "contracts\\ConversionV1.sol:719"
+          },
+          {
+            "label": "USX",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_address",
+            "contract": "ConversionV1",
+            "src": "contracts\\ConversionV1.sol:837"
+          },
+          {
+            "label": "Trace",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_address",
+            "contract": "ConversionV1",
+            "src": "contracts\\ConversionV1.sol:838"
+          },
+          {
+            "label": "router",
+            "offset": 0,
+            "slot": "5",
+            "type": "t_contract(QuickswapRouter)749",
+            "contract": "ConversionV1",
+            "src": "contracts\\ConversionV1.sol:840"
+          },
+          {
+            "label": "factory",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_contract(QuickswapFactory)759",
+            "contract": "ConversionV1",
+            "src": "contracts\\ConversionV1.sol:841"
+          },
+          {
+            "label": "PRICE_PRECISION",
+            "offset": 0,
+            "slot": "7",
+            "type": "t_uint256",
+            "contract": "ConversionV1",
+            "src": "contracts\\ConversionV1.sol:842"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(QuickswapFactory)759": {
+            "label": "contract QuickswapFactory",
+            "numberOfBytes": "20"
+          },
+          "t_contract(QuickswapRouter)749": {
+            "label": "contract QuickswapRouter",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_address)": {
+            "label": "mapping(address => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_address))": {
+            "label": "mapping(address => mapping(address => address))",
+            "numberOfBytes": "32"
           },
           "t_uint256": {
             "label": "uint256",
