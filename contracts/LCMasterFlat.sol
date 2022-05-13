@@ -2666,7 +2666,7 @@ pragma solidity ^0.7.0;
 /**
  * @title Drop NFTs implemented using the ERC-721 standard.
  */
-contract LimitedCollection is
+contract LimitedCollectionFlat is
     ERC165Upgradeable,
     ERC721Upgradeable,
     NFT721Creator,
@@ -2818,7 +2818,7 @@ contract LCMaster is Initializable, Ownable {
             "DropMaster : COLLECTION_EXISTS"
         );
 
-        bytes memory bytecode = type(LimitedCollection).creationCode;
+        bytes memory bytecode = type(LimitedCollectionFlat).creationCode;
         bytes32 salt = keccak256(abi.encodePacked(msg.sender, _colCode));
 
         assembly {

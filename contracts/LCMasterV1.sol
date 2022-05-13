@@ -126,16 +126,6 @@ interface IERC20 {
     );
 }
 
-interface NftContract {
-    function transferFrom(
-        address from,
-        address to,
-        uint256 tokenId
-    ) external;
-
-    function ownerOf(uint256 tokenId) external view returns (address owner);
-}
-
 /**
  * @dev Interface of the Price conversion contract
  */
@@ -2540,6 +2530,8 @@ abstract contract NFT721Mint is
 
     event DeviationPercentage(uint256 percentage);
 
+    event ConversionUpdated(address conversion);
+
     modifier onlyWhitelistedUsers() {
         require(
             whiteListedAddress[msg.sender] == true || whiteList == false,
@@ -2560,11 +2552,15 @@ abstract contract NFT721Mint is
     /**
      * @notice To pay fees.
      */
-    function checkMintFees(address paymentToken, uint256 feeAmount, string memory _type) internal {
+    function checkMintFees(
+        address paymentToken,
+        uint256 feeAmount,
+        string memory _type
+    ) internal {
         address payable treasury_ = getDropsTreasury();
-         if(
+        if (
             keccak256(abi.encodePacked((_type))) ==
-            keccak256(abi.encodePacked(("erc20")))
+            keccak256(abi.encodePacked(("ERC20")))
         ) {
             require(
                 erc20tokenAddress[paymentToken] == true,
@@ -2581,28 +2577,27 @@ abstract contract NFT721Mint is
                     getDropsTreasury(),
                     feeAmount
                 );
-            }
-            else {
+            } else {
                 checkDeviation(msg.value, price);
                 (bool success, ) = treasury_.call{value: msg.value}("");
                 require(success, "Transfer failed.");
             }
-        }
-        else {
+        } else {
             require(
                 erc721tokenAddress[paymentToken] == true,
                 "NFT721Mint : PaymentToken Not Supported"
             );
             require(
-                msg.sender == NftContract(paymentToken).ownerOf(feeAmount),
+                msg.sender ==
+                    IERC721Upgradeable(paymentToken).ownerOf(feeAmount),
                 "NFT721Mint : Caller is not the owner"
             );
-            NftContract(paymentToken).transferFrom(
+            IERC721Upgradeable(paymentToken).transferFrom(
                 msg.sender,
                 getDropsTreasury(),
                 feeAmount
             );
-        } 
+        }
     }
 
     function checkDeviation(uint256 feeAmount, uint256 price) public view {
@@ -2654,13 +2649,13 @@ abstract contract NFT721Mint is
         uint256 feeAmount,
         string memory _type
     ) public payable onlyWhitelistedUsers returns (uint256 tokenId) {
-            tokenId = nextTokenId++;
-            checkSupply(tokenId);
-            checkDate();
-            checkMintFees(paymentToken, feeAmount, _type);
-            _mint(msg.sender, tokenId);
-            _updateTokenCreator(tokenId, msg.sender);
-            emit Minted(msg.sender, tokenId);
+        tokenId = nextTokenId++;
+        checkSupply(tokenId);
+        checkDate();
+        checkMintFees(paymentToken, feeAmount, _type);
+        _mint(msg.sender, tokenId);
+        _updateTokenCreator(tokenId, msg.sender);
+        emit Minted(msg.sender, tokenId);
     }
 
     uint256[1000] private ______gap;
@@ -2760,12 +2755,14 @@ contract LimitedCollection is
     /**
      * @notice Allows Admin to add nft address.
      */
-    function adminUpdateERC721FeeToken(address _nftAddress, bool status) public onlyOwner {
+    function adminUpdateERC721FeeToken(address _nftAddress, bool status)
+        public
+        onlyOwner
+    {
         erc721tokenAddress[_nftAddress] = status;
         emit ERC721TokenUpdated(_nftAddress, status);
     }
 
-    
     /**
      * @notice Allows Admin to update price conversion contract
      */
@@ -2774,6 +2771,7 @@ contract LimitedCollection is
         onlyOwner
     {
         priceConversion = _conversionAddress;
+        emit ConversionUpdated(_conversionAddress);
     }
 
     /**
