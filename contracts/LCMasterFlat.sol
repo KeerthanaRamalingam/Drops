@@ -1719,7 +1719,7 @@ contract ERC721Upgradeable is
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
-    mapping(address => bool) internal whiteListedAddress;
+    mapping(address => bool) public whiteListedAddress;
 
     // Token name
     string private _name;
@@ -1756,9 +1756,6 @@ contract ERC721Upgradeable is
 
     // Collection attributes
     string[] public collectionAttributes;
-
-    //Gender
-    string[] public gender;
 
     /*
      *     bytes4(keccak256('balanceOf(address)')) == 0x70a08231
@@ -1808,7 +1805,6 @@ contract ERC721Upgradeable is
         bool whiteList_,
         address priceConversion_,
         string[] memory attributes_,
-        string[] memory gender_,
         string[8] memory collectionDetails_
     ) internal initializer {
         __Context_init_unchained();
@@ -1820,7 +1816,6 @@ contract ERC721Upgradeable is
         priceConversion = priceConversion_;
         _collectionDetails = collectionDetails_;
         collectionAttributes = attributes_;
-        gender = gender_;   
     }
 
     function _updateSupply(uint256 supply_) internal {
@@ -2679,7 +2674,7 @@ pragma solidity ^0.7.0;
 /**
  * @title Drop NFTs implemented using the ERC-721 standard.
  */
-contract LimitedCollectionFlat is
+contract LimitedCollection is
     ERC165Upgradeable,
     ERC721Upgradeable,
     NFT721Creator,
@@ -2718,7 +2713,6 @@ contract LimitedCollectionFlat is
             whitelisted,
             priceConversion,
             attributes,
-            gender,
             collectionDetails
         );
         emit CollectionDetails(symbol, attributes, gender, collectionDetails);
@@ -2847,7 +2841,7 @@ contract LCMasterV1 is Initializable, Ownable {
             "DropMaster : COLLECTION_EXISTS"
         );
 
-        bytes memory bytecode = type(LimitedCollectionFlat).creationCode;
+        bytes memory bytecode = type(LimitedCollection).creationCode;
         bytes32 salt = keccak256(abi.encodePacked(msg.sender, _colCode));
 
         assembly {
