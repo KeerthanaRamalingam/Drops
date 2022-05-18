@@ -1719,7 +1719,7 @@ contract ERC721Upgradeable is
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
-    mapping(address => bool) internal whiteListedAddress;
+    mapping(address => bool) public whiteListedAddress;
 
     // Token name
     string private _name;
@@ -1752,7 +1752,7 @@ contract ERC721Upgradeable is
     uint256 public deviationPercentage;
 
     // Collection array
-    string[9] internal _collectionDetails;
+    string[8] internal _collectionDetails;
 
     // Collection attributes
     string[] public collectionAttributes;
@@ -1805,7 +1805,7 @@ contract ERC721Upgradeable is
         bool whiteList_,
         address priceConversion_,
         string[] memory attributes_,
-        string[9] memory collectionDetails_
+        string[8] memory collectionDetails_
     ) internal initializer {
         __Context_init_unchained();
         __ERC165_init_unchained();
@@ -1900,7 +1900,6 @@ contract ERC721Upgradeable is
         returns (
             string memory description,
             string memory image,
-            string memory gender,
             string memory category,
             string memory theme,
             string memory grade,
@@ -1917,8 +1916,7 @@ contract ERC721Upgradeable is
             _collectionDetails[4],
             _collectionDetails[5],
             _collectionDetails[6],
-            _collectionDetails[7],
-            _collectionDetails[8]
+            _collectionDetails[7]
         );
     }
 
@@ -2518,12 +2516,13 @@ abstract contract NFT721Mint is
     mapping(address => bool) public erc721tokenAddress;
     uint256 internal mintFee;
 
-    event Minted(address indexed creator, uint256 indexed tokenId);
+    event Minted(address indexed creator, uint256 indexed tokenId, string data);
 
     event CollectionDetails(
         string symbol,
         string[] attributes,
-        string[9] collectionDetails
+        string[] gender,
+        string[8] collectionDetails
     );
 
     event ERC20TokenUpdated(address indexed erc20tokenAddress, bool status);
@@ -2651,7 +2650,8 @@ abstract contract NFT721Mint is
     function mint(
         address paymentToken,
         uint256 feeAmount,
-        string memory _type
+        string memory _type,
+        string memory _data
     ) public payable onlyWhitelistedUsers returns (uint256 tokenId) {
         tokenId = nextTokenId++;
         checkSupply(tokenId);
@@ -2659,7 +2659,7 @@ abstract contract NFT721Mint is
         checkMintFees(paymentToken, feeAmount, _type);
         _mint(msg.sender, tokenId);
         _updateTokenCreator(tokenId, msg.sender);
-        emit Minted(msg.sender, tokenId);
+        emit Minted(msg.sender, tokenId, _data);
     }
 
     uint256[1000] private ______gap;
@@ -2697,7 +2697,8 @@ contract LimitedCollection is
         bool whitelisted,
         address priceConversion,
         string[] memory attributes,
-        string[9] memory collectionDetails
+        string[] memory gender,
+        string[8] memory collectionDetails
     ) public initializer {
         Ownable.ownable_init();
         NFT721Creator._initializeNFT721Creator();
@@ -2714,7 +2715,7 @@ contract LimitedCollection is
             attributes,
             collectionDetails
         );
-        emit CollectionDetails(symbol, attributes, collectionDetails);
+        emit CollectionDetails(symbol, attributes, gender, collectionDetails);
     }
 
     /**
