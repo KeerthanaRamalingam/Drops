@@ -1974,6 +1974,8 @@ contract ERC721Upgradeable is
      */
     function totalSupply() public view override returns (uint256) {
         // _tokenOwners are indexed by tokenIds, so .length() returns the number of tokenIds
+         if (_supply == 0) 
+        return _tokenOwners.length();
         return _supply;
     }
 
@@ -2616,10 +2618,18 @@ abstract contract NFT721Mint is
      * @notice To check the date.
      */
     function checkDate() internal view {
-        require(
-            _startDate <= block.timestamp && block.timestamp <= _endDate,
+        if( _endDate!=0) {
+            require(
+                _startDate <= block.timestamp && block.timestamp <= _endDate,
+                "NFT721Mint : MINTING_ENDED"
+            );
+        }
+        else {
+            require(
+            _startDate <= block.timestamp ,
             "NFT721Mint : MINTING_NOT_LIVE"
-        );
+            );
+        }
     }
 
     /**
@@ -2674,7 +2684,7 @@ pragma solidity ^0.7.0;
 /**
  * @title Drop NFTs implemented using the ERC-721 standard.
  */
-contract LimitedCollection is
+contract DropsCollection is
     ERC165Upgradeable,
     ERC721Upgradeable,
     NFT721Creator,
@@ -2841,7 +2851,7 @@ contract LCMasterV1 is Initializable, Ownable {
             "DropMaster : COLLECTION_EXISTS"
         );
 
-        bytes memory bytecode = type(LimitedCollection).creationCode;
+        bytes memory bytecode = type(DropsCollection).creationCode;
         bytes32 salt = keccak256(abi.encodePacked(msg.sender, _colCode));
 
         assembly {

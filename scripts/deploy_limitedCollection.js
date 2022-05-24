@@ -35,7 +35,7 @@ async function main() {
 
     const dropsTreasury = await ethers.getContractFactory("Treasury");
     const treasuryProxy = await upgrades.deployProxy(dropsTreasury, [accounts[0]], { initializer: 'initialize' })
-    await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 10000));
 
     console.log("Treasury proxy", treasuryProxy.address);
     console.log("Is admin", await treasuryProxy.isAdmin(accounts[0]));
@@ -50,7 +50,7 @@ async function main() {
 
     const LimitedCollection = await ethers.getContractFactory("LCMasterV1")
     const LimitedCollectionProxy = await upgrades.deployProxy(LimitedCollection, { initializer: 'initialize' });
-    await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 10000));
 
     console.log("Owner", await LimitedCollectionProxy.owner());
     console.log("LimitedCollectionProxy:", LimitedCollectionProxy.address);
@@ -81,28 +81,28 @@ async function main() {
 
     const Conversion = await ethers.getContractFactory("Conversion");
     const conversion = await upgrades.deployProxy(Conversion, { initializer: 'initialize' })
-    await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 10000));
 
     console.log("conversion proxy", conversion.address);
 
     //// ************ ADD PRICE FEED ADDRESS **************/////
 
-    await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 10000));
     await conversion.addToken(MATIC, PRICE_MATIC_USD);
 
-    await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 10000));
     await conversion.addToken(USDC, PRICE_USDC_USD);
 
-    await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 10000));
     await conversion.addToken(USDT, PRICE_USDT_USD);
 
-    await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 10000));
     await conversion.addToken(USX, router);
 
-    await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 10000));
     await conversion.addToken(Trace, router);
 
-    await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 10000));
     await conversion.adminUpdate(USX, Trace, router, factory);
 
 
@@ -111,12 +111,12 @@ async function main() {
     const collectionInstance = await collection.attach(Collection);
     
     await collectionInstance.initialize(treasuryProxy.address, "Prime Collection ETH mainnet - 02 - Kiddo Monkeys 14919", "101", 20, startTime, endTime, true, conversion.address, ["Size", "Color", "Gender","Category","Theme","Style"], ["Male"], ["NFTs are unique cryptographic tokens that exist on a blockchain and cannot be replica", "https://ipfs.io/ipfs/QmRECTS8gSXLbRgomsrvi7nY6x2SCVPER4f1jSUxWpxaRu/nft.jpg", "Art & Gaming", "Pixel Art 2022", "prime", "drops", "true", "outfit"]);
-    await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 20000));
 
     //Second Collection
     const collectionInstanceTwo = await collection.attach(CollectionTwo);
 
-    await collectionInstanceTwo.initialize(treasuryProxy.address,"Trace Cryptopunk nft highest sale: nft art finance","102",40, startTime, endTime, false, conversion.address, ["Size", "Color", "Gender","Category","Theme","Style"], ["Male", "Female"],["The first drop features a collaboration with top digital artist FVCKRENDER that includes a custom World Pong League digital art piece which will unlock a virtual beer pong game with the the superstar singer-rapper, where millions of worthless copies of the same file exist.","https://ipfs.io/ipfs/QmQXbsaf32Qwo8f6vyubZNhDq9oYPwhapc7pvdzYE5CVM2","Art & Gaming-100","Pixel Art 2022-100","prime","drops","true","outfit"]);
+    await collectionInstanceTwo.initialize(treasuryProxy.address,"Trace Cryptopunk nft highest sale: nft art finance","102",40, startTime, 0, false, conversion.address, ["Size", "Color", "Gender","Category","Theme","Style"], ["Male", "Female"],["The first drop features a collaboration with top digital artist FVCKRENDER that includes a custom World Pong League digital art piece which will unlock a virtual beer pong game with the the superstar singer-rapper, where millions of worthless copies of the same file exist.","https://ipfs.io/ipfs/QmQXbsaf32Qwo8f6vyubZNhDq9oYPwhapc7pvdzYE5CVM2","Art & Gaming-100","Pixel Art 2022-100","prime","drops","true","outfit"]);
     await new Promise(res => setTimeout(res, 5000));
 
     //Third Collection
@@ -130,30 +130,33 @@ async function main() {
 
     //// ************ ADD TOKEN TO First Collection **************/////
 
-    await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 10000));
     await collectionInstance.adminUpdateERC20FeeToken(MATIC, true); // Matic
 
-    await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 10000));
     await collectionInstance.adminUpdateERC20FeeToken(USDT, true); // USDT
 
-    await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 10000));
     await collectionInstance.adminUpdateERC20FeeToken(USDC, true); // USDC
 
-    await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 10000));
     await collectionInstance.adminUpdateERC20FeeToken(Trace, true); // Trace
 
-    await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 10000));
     await collectionInstance.adminUpdateERC20FeeToken(USX, true); // USX
 
     await collectionInstance.adminUpdateERC721FeeToken(NFTToken, true); // USDC
 
-    await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 10000));
     console.log("Supported token", await collectionInstance.tokenAddress(MATIC));
 
     await collectionInstance.adminUpdateFees(mintFee);
-    await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 10000));
 
     console.log("Mint fee", await collectionInstance.getMintFee());
+
+    await collectionInstance.adminUpdateDeviation(5);
+    await new Promise(res => setTimeout(res, 10000));
 
     await collectionInstance.updateWhitelist([accounts[0]], [true]);
     await new Promise(res => setTimeout(res, 5000));

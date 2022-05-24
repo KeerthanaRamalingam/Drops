@@ -1,3 +1,11 @@
+/**
+ *Submitted for verification at polygonscan.com on 2022-05-12
+*/
+
+/**
+ *Submitted for verification at polygonscan.com on 2022-04-20
+ */
+
 // SPDX-License-Identifier: UNLICENSED
 // File: contracts/Collection.sol
 
@@ -122,6 +130,21 @@ interface IERC20 {
     );
 }
 
+/**
+ * @dev Interface of the Price conversion contract
+ */
+interface ConversionInt {
+    function convertMintFee(address paymentToken, uint256 mintFee)
+        external
+        view
+        returns (uint256);
+
+    function convertUpdateFee(address paymentToken, uint256 updateFee)
+        external
+        view
+        returns (uint256);
+}
+
 // File @openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol@v3.4.1-solc-0.7
 
 pragma solidity ^0.7.0;
@@ -161,61 +184,6 @@ library AddressUpgradeable {
     }
 
     /**
-     * @dev Replacement for Solidity's `transfer`: sends `amount` wei to
-     * `recipient`, forwarding all available gas and reverting on errors.
-     *
-     * https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost
-     * of certain opcodes, possibly making contracts go over the 2300 gas limit
-     * imposed by `transfer`, making them unable to receive funds via
-     * `transfer`. {sendValue} removes this limitation.
-     *
-     * https://diligence.consensys.net/posts/2019/09/stop-using-soliditys-transfer-now/[Learn more].
-     *
-     * IMPORTANT: because control is transferred to `recipient`, care must be
-     * taken to not create reentrancy vulnerabilities. Consider using
-     * {ReentrancyGuard} or the
-     * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].
-     */
-    function sendValue(address payable recipient, uint256 amount) internal {
-        require(
-            address(this).balance >= amount,
-            "Address: insufficient balance"
-        );
-
-        // solhint-disable-next-line avoid-low-level-calls, avoid-call-value
-        (bool success, ) = recipient.call{value: amount}("");
-        require(
-            success,
-            "Address: unable to send value, recipient may have reverted"
-        );
-    }
-
-    /**
-     * @dev Performs a Solidity function call using a low level `call`. A
-     * plain`call` is an unsafe replacement for a function call: use this
-     * function instead.
-     *
-     * If `target` reverts with a revert reason, it is bubbled up by this
-     * function (like regular Solidity function calls).
-     *
-     * Returns the raw returned data. To convert to the expected return value,
-     * use https://solidity.readthedocs.io/en/latest/units-and-global-variables.html?highlight=abi.decode#abi-encoding-and-decoding-functions[`abi.decode`].
-     *
-     * Requirements:
-     *
-     * - `target` must be a contract.
-     * - calling `target` with `data` must not revert.
-     *
-     * _Available since v3.1._
-     */
-    function functionCall(address target, bytes memory data)
-        internal
-        returns (bytes memory)
-    {
-        return functionCall(target, data, "Address: low-level call failed");
-    }
-
-    /**
      * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`], but with
      * `errorMessage` as a fallback revert reason when `target` reverts.
      *
@@ -227,31 +195,6 @@ library AddressUpgradeable {
         string memory errorMessage
     ) internal returns (bytes memory) {
         return functionCallWithValue(target, data, 0, errorMessage);
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
-     * but also transferring `value` wei to `target`.
-     *
-     * Requirements:
-     *
-     * - the calling contract must have an ETH balance of at least `value`.
-     * - the called Solidity function must be `payable`.
-     *
-     * _Available since v3.1._
-     */
-    function functionCallWithValue(
-        address target,
-        bytes memory data,
-        uint256 value
-    ) internal returns (bytes memory) {
-        return
-            functionCallWithValue(
-                target,
-                data,
-                value,
-                "Address: low-level call with value failed"
-            );
     }
 
     /**
@@ -276,43 +219,6 @@ library AddressUpgradeable {
         (bool success, bytes memory returndata) = target.call{value: value}(
             data
         );
-        return _verifyCallResult(success, returndata, errorMessage);
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
-     * but performing a static call.
-     *
-     * _Available since v3.3._
-     */
-    function functionStaticCall(address target, bytes memory data)
-        internal
-        view
-        returns (bytes memory)
-    {
-        return
-            functionStaticCall(
-                target,
-                data,
-                "Address: low-level static call failed"
-            );
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],
-     * but performing a static call.
-     *
-     * _Available since v3.3._
-     */
-    function functionStaticCall(
-        address target,
-        bytes memory data,
-        string memory errorMessage
-    ) internal view returns (bytes memory) {
-        require(isContract(target), "Address: static call to non-contract");
-
-        // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory returndata) = target.staticcall(data);
         return _verifyCallResult(success, returndata, errorMessage);
     }
 
@@ -1009,8 +915,8 @@ abstract contract Ownable is ContextUpgradeable {
     /**
      * @dev Initializes the contract setting the deployer as the initial owner.
      */
-    function ownable_init(address owner_) internal initializer {
-        _transferOwnership(owner_);
+    function ownable_init() internal initializer {
+        _transferOwnership(_msgSender());
     }
 
     /**
@@ -1813,7 +1719,7 @@ contract ERC721Upgradeable is
     // Mapping from owner to operator approvals
     mapping(address => mapping(address => bool)) private _operatorApprovals;
 
-    mapping(address => bool) internal whiteListedAddress;
+    mapping(address => bool) public whiteListedAddress;
 
     // Token name
     string private _name;
@@ -1833,11 +1739,20 @@ contract ERC721Upgradeable is
     //StartDate
     uint256 internal _startDate;
 
-    //EndDate
-    uint256 internal _endDate;
-
     //WhiteList
     bool public whiteList;
+
+    // Price Conversion
+    address public priceConversion;
+
+    // Deviation Percentage
+    uint256 public deviationPercentage;
+
+    // Collection array
+    string[8] internal _collectionDetails;
+
+    // Collection attributes
+    string[] public collectionAttributes;
 
     /*
      *     bytes4(keccak256('balanceOf(address)')) == 0x70a08231
@@ -1883,15 +1798,20 @@ contract ERC721Upgradeable is
         string memory symbol_,
         uint256 supply_,
         uint256 startDate_,
-        uint256 endDate_,
-        bool whiteList_
+        bool whiteList_,
+        address priceConversion_,
+        string[] memory attributes_,
+        string[8] memory collectionDetails_
     ) internal initializer {
         __Context_init_unchained();
         __ERC165_init_unchained();
         __ERC721_init_unchained(name_, symbol_);
         _updateSupply(supply_);
-        _setTime(startDate_, endDate_);
+        _setTime(startDate_);
         whiteList = whiteList_;
+        priceConversion = priceConversion_;
+        _collectionDetails = collectionDetails_;
+        collectionAttributes = attributes_;
     }
 
     function _updateSupply(uint256 supply_) internal {
@@ -1911,9 +1831,8 @@ contract ERC721Upgradeable is
         _registerInterface(_INTERFACE_ID_ERC721_ENUMERABLE);
     }
 
-    function _setTime(uint256 startDate_, uint256 endDate_) internal {
+    function _setTime(uint256 startDate_) internal {
         _startDate = startDate_;
-        _endDate = endDate_;
     }
 
     /**
@@ -1960,11 +1879,34 @@ contract ERC721Upgradeable is
         return _startDate;
     }
 
+
     /**
-     * Returns endDate of minting process
+     * Returns all collection details
      */
-    function endDate() public view returns (uint256) {
-        return _endDate;
+    function getCollectionDetails()
+        public
+        view
+        returns (
+            string memory description,
+            string memory image,
+            string memory category,
+            string memory theme,
+            string memory grade,
+            string memory colType,
+            string memory isWardrobeEnabled,
+            string memory wardrobeType
+        )
+    {
+        return (
+            _collectionDetails[0],
+            _collectionDetails[1],
+            _collectionDetails[2],
+            _collectionDetails[3],
+            _collectionDetails[4],
+            _collectionDetails[5],
+            _collectionDetails[6],
+            _collectionDetails[7]
+        );
     }
 
     /**
@@ -2453,232 +2395,6 @@ abstract contract TreasuryNode is Initializable {
     uint256[2000] private __gap;
 }
 
-// File contracts/interfaces/IAdminRole.sol
-
-pragma solidity ^0.7.0;
-
-/**
- * @notice Interface for AdminRole which wraps the default admin role from
- * OpenZeppelin's AccessControl for easy integration.
- */
-interface IAdminRole {
-    function isAdmin(address account) external view returns (bool);
-}
-
-pragma solidity ^0.7.0;
-
-/**
- * @notice A place for common modifiers and functions used by various NFT721 mixins, if any.
- * @dev This also leaves a gap which can be used to add a new mixin to the top of the inheritance tree.
- */
-abstract contract NFT721Core {
-    uint256[1000] private ______gap;
-}
-
-// File @openzeppelin/contracts/utils/Address.sol@v3.1.0-solc-0.7
-
-pragma solidity ^0.7.0;
-
-/**
- * @dev Collection of functions related to the address type
- */
-library Address {
-    /**
-     * @dev Returns true if `account` is a contract.
-     *
-     * [IMPORTANT]
-     * ====
-     * It is unsafe to assume that an address for which this function returns
-     * false is an externally-owned account (EOA) and not a contract.
-     *
-     * Among others, `isContract` will return false for the following
-     * types of addresses:
-     *
-     *  - an externally-owned account
-     *  - a contract in construction
-     *  - an address where a contract will be created
-     *  - an address where a contract lived, but was destroyed
-     * ====
-     */
-    function isContract(address account) internal view returns (bool) {
-        // According to EIP-1052, 0x0 is the value returned for not-yet created accounts
-        // and 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470 is returned
-        // for accounts without code, i.e. `keccak256('')`
-        bytes32 codehash;
-        bytes32 accountHash = 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470;
-        // solhint-disable-next-line no-inline-assembly
-        assembly {
-            codehash := extcodehash(account)
-        }
-        return (codehash != accountHash && codehash != 0x0);
-    }
-
-    /**
-     * @dev Replacement for Solidity's `transfer`: sends `amount` wei to
-     * `recipient`, forwarding all available gas and reverting on errors.
-     *
-     * https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost
-     * of certain opcodes, possibly making contracts go over the 2300 gas limit
-     * imposed by `transfer`, making them unable to receive funds via
-     * `transfer`. {sendValue} removes this limitation.
-     *
-     * https://diligence.consensys.net/posts/2019/09/stop-using-soliditys-transfer-now/[Learn more].
-     *
-     * IMPORTANT: because control is transferred to `recipient`, care must be
-     * taken to not create reentrancy vulnerabilities. Consider using
-     * {ReentrancyGuard} or the
-     * https://solidity.readthedocs.io/en/v0.5.11/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].
-     */
-    function sendValue(address payable recipient, uint256 amount) internal {
-        require(
-            address(this).balance >= amount,
-            "Address: insufficient balance"
-        );
-
-        // solhint-disable-next-line avoid-low-level-calls, avoid-call-value
-        (bool success, ) = recipient.call{value: amount}("");
-        require(
-            success,
-            "Address: unable to send value, recipient may have reverted"
-        );
-    }
-
-    /**
-     * @dev Performs a Solidity function call using a low level `call`. A
-     * plain`call` is an unsafe replacement for a function call: use this
-     * function instead.
-     *
-     * If `target` reverts with a revert reason, it is bubbled up by this
-     * function (like regular Solidity function calls).
-     *
-     * Returns the raw returned data. To convert to the expected return value,
-     * use https://solidity.readthedocs.io/en/latest/units-and-global-variables.html?highlight=abi.decode#abi-encoding-and-decoding-functions[`abi.decode`].
-     *
-     * Requirements:
-     *
-     * - `target` must be a contract.
-     * - calling `target` with `data` must not revert.
-     *
-     * _Available since v3.1._
-     */
-    function functionCall(address target, bytes memory data)
-        internal
-        returns (bytes memory)
-    {
-        return functionCall(target, data, "Address: low-level call failed");
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`], but with
-     * `errorMessage` as a fallback revert reason when `target` reverts.
-     *
-     * _Available since v3.1._
-     */
-    function functionCall(
-        address target,
-        bytes memory data,
-        string memory errorMessage
-    ) internal returns (bytes memory) {
-        return _functionCallWithValue(target, data, 0, errorMessage);
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],
-     * but also transferring `value` wei to `target`.
-     *
-     * Requirements:
-     *
-     * - the calling contract must have an ETH balance of at least `value`.
-     * - the called Solidity function must be `payable`.
-     *
-     * _Available since v3.1._
-     */
-    function functionCallWithValue(
-        address target,
-        bytes memory data,
-        uint256 value
-    ) internal returns (bytes memory) {
-        return
-            functionCallWithValue(
-                target,
-                data,
-                value,
-                "Address: low-level call with value failed"
-            );
-    }
-
-    /**
-     * @dev Same as {xref-Address-functionCallWithValue-address-bytes-uint256-}[`functionCallWithValue`], but
-     * with `errorMessage` as a fallback revert reason when `target` reverts.
-     *
-     * _Available since v3.1._
-     */
-    function functionCallWithValue(
-        address target,
-        bytes memory data,
-        uint256 value,
-        string memory errorMessage
-    ) internal returns (bytes memory) {
-        require(
-            address(this).balance >= value,
-            "Address: insufficient balance for call"
-        );
-        return _functionCallWithValue(target, data, value, errorMessage);
-    }
-
-    function _functionCallWithValue(
-        address target,
-        bytes memory data,
-        uint256 weiValue,
-        string memory errorMessage
-    ) private returns (bytes memory) {
-        require(isContract(target), "Address: call to non-contract");
-
-        // solhint-disable-next-line avoid-low-level-calls
-        (bool success, bytes memory returndata) = target.call{value: weiValue}(
-            data
-        );
-        if (success) {
-            return returndata;
-        } else {
-            // Look for revert reason and bubble it up if present
-            if (returndata.length > 0) {
-                // The easiest way to bubble the revert reason is using memory via assembly
-
-                // solhint-disable-next-line no-inline-assembly
-                assembly {
-                    let returndata_size := mload(returndata)
-                    revert(add(32, returndata), returndata_size)
-                }
-            } else {
-                revert(errorMessage);
-            }
-        }
-    }
-}
-
-// File contracts/interfaces/IERC1271.sol
-
-pragma solidity ^0.7.0;
-
-/**
- * @dev Interface of the ERC1271 standard signature validation method for
- * contracts as defined in https://eips.ethereum.org/EIPS/eip-1271[ERC-1271].
- *
- * from https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.1.0/contracts/interfaces/IERC1271.sol
- */
-interface IERC1271 {
-    /**
-     * @dev Should return whether the signature provided is valid for the provided data
-     * @param hash      Hash of the data to be signed
-     * @param signature Signature byte array associated with _data
-     */
-    function isValidSignature(bytes32 hash, bytes memory signature)
-        external
-        view
-        returns (bytes4 magicValue);
-}
-
 // File contracts/mixins/NFT721Creator.sol
 
 pragma solidity ^0.7.0;
@@ -2760,64 +2476,12 @@ pragma solidity ^0.7.0;
  * @notice A mixin to extend the OpenZeppelin metadata implementation.
  */
 abstract contract NFT721Metadata is NFT721Creator {
-    // using StringsUpgradeable for uint256;
-
-    /**
-     * @dev Stores hashes minted by a creator to prevent duplicates.
-     */
-    mapping(address => mapping(string => bool))
-        private creatorToIPFSHashToMinted;
-
     event BaseURIUpdated(string baseURI);
-    event TokenIPFSPathUpdated(
-        uint256 indexed tokenId,
-        string indexed indexedTokenIPFSPath,
-        string tokenIPFSPath
-    );
-
-    // This event was used in an order version of the contract
-    //event NFTMetadataUpdated(string name, string symbol, string baseURI);
-
-    /**
-     * @notice Returns the IPFSPath to the metadata JSON file for a given NFT.
-     */
-    function getTokenIPFSPath(uint256 tokenId)
-        public
-        view
-        returns (string memory)
-    {
-        return _tokenURIs[tokenId];
-    }
 
     function _updateBaseURI(string memory _baseURI) internal {
         _setBaseURI(_baseURI);
 
         emit BaseURIUpdated(_baseURI);
-    }
-
-    /**
-     * @dev The IPFS path should be the CID + file.extension, e.g.
-     * `QmfPsfGwLhiJrU8t9HpG4wuyjgPo9bk8go4aQqSu9Qg4h7/metadata.json`
-     */
-    function _setTokenIPFSPath(uint256 tokenId, string memory _tokenIPFSPath)
-        internal
-    {
-        // 46 is the minimum length for an IPFS content hash, it may be longer if paths are used
-        require(
-            bytes(_tokenIPFSPath).length >= 46,
-            "NFT721Metadata: Invalid IPFS path"
-        );
-        require(
-            !creatorToIPFSHashToMinted[msg.sender][_tokenIPFSPath],
-            "NFT721Metadata: NFT was already minted"
-        );
-        if (creatorToIPFSHashToMinted[msg.sender][getTokenIPFSPath(tokenId)])
-            creatorToIPFSHashToMinted[msg.sender][
-                getTokenIPFSPath(tokenId)
-            ] = false;
-
-        creatorToIPFSHashToMinted[msg.sender][_tokenIPFSPath] = true;
-        _setTokenURI(tokenId, _tokenIPFSPath);
     }
 
     uint256[999] private ______gap;
@@ -2837,20 +2501,30 @@ abstract contract NFT721Mint is
     NFT721Metadata,
     TreasuryNode
 {
+    using SafeMathUpgradeable for uint256;
     uint256 private nextTokenId;
-    mapping(address => bool) public tokenAddress;
-    mapping(address => uint256) public mintFees;
+    mapping(address => bool) public erc20tokenAddress;
+    mapping(address => bool) public erc721tokenAddress;
+    uint256 internal mintFee;
 
-    event Minted(
-        address indexed creator,
-        uint256 indexed tokenId,
-        string indexed indexedTokenIPFSPath,
-        string tokenIPFSPath
+    event Minted(address indexed creator, uint256 indexed tokenId, string data);
+
+    event CollectionDetails(
+        string symbol,
+        string[] attributes,
+        string[] gender,
+        string[8] collectionDetails
     );
 
-    event TokenUpdated(address indexed tokenAddress, bool status);
+    event ERC20TokenUpdated(address indexed erc20tokenAddress, bool status);
 
-    event TokenFeesUpdated(address indexed tokenAddress, uint256 mintFee);
+    event ERC721TokenUpdated(address indexed erc721tokenAddress, bool status);
+
+    event TokenFeesUpdated(uint256 mintFee);
+
+    event DeviationPercentage(uint256 percentage);
+
+    event ConversionUpdated(address conversion);
 
     modifier onlyWhitelistedUsers() {
         require(
@@ -2863,7 +2537,7 @@ abstract contract NFT721Mint is
     /**
      * @notice To check the totalSupply.
      */
-    function _supplyCheck(uint256 tokenId) internal view {
+    function checkSupply(uint256 tokenId) internal view {
         if (_supply != 0) {
             require(tokenId <= _supply, "NFT721Mint : SUPPLY_LIMIT_REACHED");
         }
@@ -2872,32 +2546,69 @@ abstract contract NFT721Mint is
     /**
      * @notice To pay fees.
      */
-    function _feeCheck(address paymentToken) internal {
-        require(
-            tokenAddress[paymentToken] == true,
-            "NFT721Mint : INVALID_PAYMENT_TOKEN"
-        );
-        if (paymentToken != address(0)) {
-            IERC20(paymentToken).transferFrom(
-                msg.sender,
-                getDropsTreasury(),
-                mintFees[paymentToken]
+    function checkMintFees(
+        address paymentToken,
+        uint256 feeAmount,
+        string memory _type
+    ) internal {
+        address payable treasury_ = getDropsTreasury();
+        if (
+            keccak256(abi.encodePacked((_type))) ==
+            keccak256(abi.encodePacked(("ERC20")))
+        ) {
+            require(
+                erc20tokenAddress[paymentToken] == true,
+                "NFT721Mint : PaymentToken Not Supported"
             );
+            uint256 price = ConversionInt(priceConversion).convertMintFee(
+                paymentToken,
+                getMintFee()
+            );
+            if (paymentToken != address(0)) {
+                checkDeviation(feeAmount, price);
+                IERC20(paymentToken).transferFrom(
+                    msg.sender,
+                    getDropsTreasury(),
+                    feeAmount
+                );
+            } else {
+                checkDeviation(msg.value, price);
+                (bool success, ) = treasury_.call{value: msg.value}("");
+                require(success, "Transfer failed.");
+            }
         } else {
             require(
-                msg.value >= mintFees[paymentToken],
-                "NFT721Mint : INSUFFICIENT_FEE_AMOUNT"
+                erc721tokenAddress[paymentToken] == true,
+                "NFT721Mint : PaymentToken Not Supported"
             );
-            getDropsTreasury().transfer(address(this).balance);
+            require(
+                msg.sender ==
+                    IERC721Upgradeable(paymentToken).ownerOf(feeAmount),
+                "NFT721Mint : Caller is not the owner"
+            );
+            IERC721Upgradeable(paymentToken).transferFrom(
+                msg.sender,
+                getDropsTreasury(),
+                feeAmount
+            );
         }
+    }
+
+    function checkDeviation(uint256 feeAmount, uint256 price) public view {
+        require(
+            feeAmount >= price.sub((price.mul(deviationPercentage)).div(100)) &&
+                feeAmount <=
+                price.add((price.mul(deviationPercentage)).div(100)),
+            "Amount not within deviation percentage"
+        );
     }
 
     /**
      * @notice To check the date.
      */
-    function _dateCheck() internal view {
+    function checkDate() internal view {
         require(
-            _startDate <= block.timestamp, 
+            _startDate <= block.timestamp ,
             "NFT721Mint : MINTING_NOT_LIVE"
         );
     }
@@ -2907,6 +2618,13 @@ abstract contract NFT721Mint is
      */
     function getNextTokenId() public view returns (uint256) {
         return nextTokenId;
+    }
+
+    /**
+     * @notice Gets the mint Fee
+     */
+    function getMintFee() public view returns (uint256) {
+        return mintFee;
     }
 
     /**
@@ -2920,20 +2638,19 @@ abstract contract NFT721Mint is
     /**
      * @notice Allows a creator to mint an NFT.
      */
-    function mint(string memory tokenIPFSPath, address paymentToken)
-        public
-        payable
-        onlyWhitelistedUsers
-        returns (uint256 tokenId)
-    {
+    function mint(
+        address paymentToken,
+        uint256 feeAmount,
+        string memory _type,
+        string memory _data
+    ) public payable onlyWhitelistedUsers returns (uint256 tokenId) {
         tokenId = nextTokenId++;
-        _supplyCheck(tokenId);
-        _dateCheck();
-        _feeCheck(paymentToken);
+        checkSupply(tokenId);
+        checkDate();
+        checkMintFees(paymentToken, feeAmount, _type);
         _mint(msg.sender, tokenId);
         _updateTokenCreator(tokenId, msg.sender);
-        _setTokenIPFSPath(tokenId, tokenIPFSPath);
-        emit Minted(msg.sender, tokenId, tokenIPFSPath, tokenIPFSPath);
+        emit Minted(msg.sender, tokenId, _data);
     }
 
     uint256[1000] private ______gap;
@@ -2941,18 +2658,19 @@ abstract contract NFT721Mint is
 
 // File contracts/FNDNFT721.sol
 
+pragma experimental ABIEncoderV2;
+
 pragma solidity ^0.7.0;
 
 /**
  * @title Drop NFTs implemented using the ERC-721 standard.
  */
-contract PerpetualCollection is 
+contract LimitedCollection is
     ERC165Upgradeable,
     ERC721Upgradeable,
     NFT721Creator,
     NFT721Metadata,
     TreasuryNode,
-    NFT721Core,
     NFT721Mint,
     Ownable
 {
@@ -2966,11 +2684,13 @@ contract PerpetualCollection is
         string memory symbol,
         uint256 supply,
         uint256 startDate,
-        uint256 endDate,
         bool whitelisted,
-        address controller
+        address priceConversion,
+        string[] memory attributes,
+        string[] memory gender,
+        string[8] memory collectionDetails
     ) public initializer {
-        Ownable.ownable_init(controller);
+        Ownable.ownable_init();
         NFT721Creator._initializeNFT721Creator();
         NFT721Mint._initializeNFT721Mint();
         TreasuryNode._initializeTreasuryNode(treasury);
@@ -2979,9 +2699,12 @@ contract PerpetualCollection is
             symbol,
             supply,
             startDate,
-            endDate,
-            whitelisted
+            whitelisted,
+            priceConversion,
+            attributes,
+            collectionDetails
         );
+        emit CollectionDetails(symbol, attributes, gender, collectionDetails);
     }
 
     /**
@@ -2995,28 +2718,54 @@ contract PerpetualCollection is
     /**
      * @notice Allows Admin to add token address.
      */
-    function adminUpdateToken(address _tokenAddress, bool status)
+    function adminUpdateERC20FeeToken(address _tokenAddress, bool status)
         public
         onlyOwner
     {
-        tokenAddress[_tokenAddress] = status;
-        emit TokenUpdated(_tokenAddress, status);
+        erc20tokenAddress[_tokenAddress] = status;
+        emit ERC20TokenUpdated(_tokenAddress, status);
     }
 
     /**
      * @notice Allows Admin to add fees for token address.
      */
 
-    function adminUpdateFees(address _tokenAddress, uint256 _mintFee)
+    function adminUpdateFees(uint256 _mintFee) public onlyOwner {
+        mintFee = _mintFee;
+        emit TokenFeesUpdated(mintFee);
+    }
+
+    /**
+     * @notice Allows Admin to update deviation percentage
+     */
+    function adminUpdateDeviation(uint256 _deviationPercentage)
         public
         onlyOwner
     {
-        require(
-            tokenAddress[_tokenAddress] == true,
-            "LimitedCollection : INVALID_PAYMENT_TOKEN"
-        );
-        mintFees[_tokenAddress] = _mintFee;
-        emit TokenFeesUpdated(_tokenAddress, _mintFee);
+        deviationPercentage = _deviationPercentage;
+        emit DeviationPercentage(_deviationPercentage);
+    }
+
+    /**
+     * @notice Allows Admin to add nft address.
+     */
+    function adminUpdateERC721FeeToken(address _nftAddress, bool status)
+        public
+        onlyOwner
+    {
+        erc721tokenAddress[_nftAddress] = status;
+        emit ERC721TokenUpdated(_nftAddress, status);
+    }
+
+    /**
+     * @notice Allows Admin to update price conversion contract
+     */
+    function adminUpdateConversion(address _conversionAddress)
+        public
+        onlyOwner
+    {
+        priceConversion = _conversionAddress;
+        emit ConversionUpdated(_conversionAddress);
     }
 
     /**
@@ -3027,10 +2776,77 @@ contract PerpetualCollection is
         address[] memory _whitelistAddresses,
         bool[] memory status
     ) public onlyOwner {
-        require(whiteList == true, "LimitedCollection : PUBLIC_COLLECTION");
+        require(whiteList == true, "DropsCollection : PUBLIC_COLLECTION");
         for (uint256 i = 0; i < _whitelistAddresses.length; i++) {
             whiteListedAddress[_whitelistAddresses[i]] = status[i];
             emit WhiteList(_whitelistAddresses[i], status[i]);
         }
+    }
+}
+
+pragma solidity ^0.7.0;
+
+contract LCMasterV1 is Initializable, Ownable {
+    address payable treasury;
+
+    struct collectionInfo {
+        // the collection symbol
+        string symbol;
+        // the contract address
+        address newCollection;
+    }
+
+    /**
+     * @notice Called once to configure the contract after the initial deployment.
+     * @dev This farms the initialize call out to inherited contracts as needed.
+     */
+    function initialize() public initializer {
+        Ownable.ownable_init();
+    }
+
+    // collection info mapping
+    mapping(address => mapping(string => collectionInfo)) public collections;
+    // get collection
+    mapping(address => mapping(string => address)) public getCollection;
+    // get collection code with address
+    mapping(address => string) public getCode;
+
+    event CollectionCreated(
+        address creator,
+        string colCode,
+        address newCollection
+    );
+
+    /**
+     * @notice Allows admin to create a collection.
+     */
+    function createCollection(string memory _colCode)
+        external
+        onlyOwner
+        returns (address collection)
+    {
+        require(
+            getCollection[msg.sender][_colCode] == address(0),
+            "DropMaster : COLLECTION_EXISTS"
+        );
+
+        bytes memory bytecode = type(LimitedCollection).creationCode;
+        bytes32 salt = keccak256(abi.encodePacked(msg.sender, _colCode));
+
+        assembly {
+            collection := create2(0, add(bytecode, 32), mload(bytecode), salt)
+        }
+
+        require(collection != address(0), "Collection creation ?");
+
+        getCollection[msg.sender][_colCode] = collection;
+        getCode[collection] = _colCode;
+
+        collections[msg.sender][_colCode] = collectionInfo({
+            symbol: _colCode,
+            newCollection: collection
+        });
+
+        emit CollectionCreated(msg.sender, _colCode, collection);
     }
 }
