@@ -1721,6 +1721,8 @@ contract ERC721Upgradeable is
 
     mapping(address => bool) public whiteListedAddress;
 
+    mapping(uint256 => bool) public status;
+
     // Token name
     string private _name;
 
@@ -1752,7 +1754,7 @@ contract ERC721Upgradeable is
     uint256 public deviationPercentage;
 
     // Collection array
-    string[8] internal _collectionDetails;
+    string[9] internal _collectionDetails;
 
     // Collection attributes
     string[] public collectionAttributes;
@@ -1791,7 +1793,7 @@ contract ERC721Upgradeable is
      */
     bytes4 private constant _INTERFACE_ID_ERC721_ENUMERABLE = 0x780e9d63;
 
-    event WhiteList(address whiteListedAddress, bool status);
+    event WhiteList(address whiteListedAddress, bool _status);
 
     /**
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
@@ -1805,7 +1807,7 @@ contract ERC721Upgradeable is
         bool whiteList_,
         address priceConversion_,
         string[] memory attributes_,
-        string[8] memory collectionDetails_
+        string[9] memory collectionDetails_
     ) internal initializer {
         __Context_init_unchained();
         __ERC165_init_unchained();
@@ -1898,6 +1900,7 @@ contract ERC721Upgradeable is
         public
         view
         returns (
+            string memory gender,
             string memory description,
             string memory image,
             string memory category,
@@ -1916,7 +1919,8 @@ contract ERC721Upgradeable is
             _collectionDetails[4],
             _collectionDetails[5],
             _collectionDetails[6],
-            _collectionDetails[7]
+            _collectionDetails[7],
+            _collectionDetails[8]
         );
     }
 
@@ -1974,6 +1978,8 @@ contract ERC721Upgradeable is
      */
     function totalSupply() public view override returns (uint256) {
         // _tokenOwners are indexed by tokenIds, so .length() returns the number of tokenIds
+         if (_supply == 0) 
+        return _tokenOwners.length();
         return _supply;
     }
 
@@ -2061,9 +2067,21 @@ contract ERC721Upgradeable is
             _isApprovedOrOwner(_msgSender(), tokenId),
             "ERC721: transfer caller is not owner nor approved"
         );
+        require(status[tokenId]==false,"ERC721: Token cannot be transferred");
 
         _transfer(from, to, tokenId);
     }
+
+    function lock(uint256 tokenId) external {
+        require(_exists(tokenId),"ERC721: operator query for nonexistent token");
+        status[tokenId] = true;
+    }
+
+    function release(uint256 tokenId) external {
+        require(_exists(tokenId),"ERC721: operator query for nonexistent token");
+        status[tokenId] = false;
+    }
+
 
     /**
      * @dev See {IERC721-safeTransferFrom}.
@@ -2089,6 +2107,8 @@ contract ERC721Upgradeable is
             _isApprovedOrOwner(_msgSender(), tokenId),
             "ERC721: transfer caller is not owner nor approved"
         );
+
+        require(status[tokenId]==false,"ERC721: Token cannot be transferred");
         _safeTransfer(from, to, tokenId, _data);
     }
 
@@ -2516,18 +2536,17 @@ abstract contract NFT721Mint is
     mapping(address => bool) public erc721tokenAddress;
     uint256 internal mintFee;
 
-    event Minted(address indexed creator, uint256 indexed tokenId, string data);
+    event Minted(address indexed creator, uint256 indexed tokenId);
 
     event CollectionDetails(
         string symbol,
         string[] attributes,
-        string[] gender,
-        string[8] collectionDetails
+        string[9] collectionDetails
     );
 
-    event ERC20TokenUpdated(address indexed erc20tokenAddress, bool status);
+    event ERC20TokenUpdated(address indexed erc20tokenAddress, bool _status);
 
-    event ERC721TokenUpdated(address indexed erc721tokenAddress, bool status);
+    event ERC721TokenUpdated(address indexed erc721tokenAddress, bool _status);
 
     event TokenFeesUpdated(uint256 mintFee);
 
@@ -2616,10 +2635,18 @@ abstract contract NFT721Mint is
      * @notice To check the date.
      */
     function checkDate() internal view {
+        if( _endDate!=0) {
         require(
             _startDate <= block.timestamp && block.timestamp <= _endDate,
-            "NFT721Mint : MINTING_NOT_LIVE"
+            "NFT721Mint : MINTING_ENDED"
         );
+        }
+        else {
+            require(
+            _startDate <= block.timestamp ,
+            "NFT721Mint : MINTING_NOT_LIVE"
+            );
+        }
     }
 
     /**
@@ -2650,8 +2677,7 @@ abstract contract NFT721Mint is
     function mint(
         address paymentToken,
         uint256 feeAmount,
-        string memory _type,
-        string memory _data
+        string memory _type
     ) public payable onlyWhitelistedUsers returns (uint256 tokenId) {
         tokenId = nextTokenId++;
         checkSupply(tokenId);
@@ -2659,7 +2685,7 @@ abstract contract NFT721Mint is
         checkMintFees(paymentToken, feeAmount, _type);
         _mint(msg.sender, tokenId);
         _updateTokenCreator(tokenId, msg.sender);
-        emit Minted(msg.sender, tokenId, _data);
+        emit Minted(msg.sender, tokenId);
     }
 
     uint256[1000] private ______gap;
@@ -2674,7 +2700,7 @@ pragma solidity ^0.7.0;
 /**
  * @title Drop NFTs implemented using the ERC-721 standard.
  */
-contract LimitedCollection is
+contract DropsCollection is
     ERC165Upgradeable,
     ERC721Upgradeable,
     NFT721Creator,
@@ -2697,8 +2723,7 @@ contract LimitedCollection is
         bool whitelisted,
         address priceConversion,
         string[] memory attributes,
-        string[] memory gender,
-        string[8] memory collectionDetails
+        string[9] memory collectionDetails
     ) public initializer {
         Ownable.ownable_init();
         NFT721Creator._initializeNFT721Creator();
@@ -2715,7 +2740,7 @@ contract LimitedCollection is
             attributes,
             collectionDetails
         );
-        emit CollectionDetails(symbol, attributes, gender, collectionDetails);
+        emit CollectionDetails(symbol, attributes, collectionDetails);
     }
 
     /**
@@ -2729,12 +2754,12 @@ contract LimitedCollection is
     /**
      * @notice Allows Admin to add token address.
      */
-    function adminUpdateERC20FeeToken(address _tokenAddress, bool status)
+    function adminUpdateERC20FeeToken(address _tokenAddress, bool _status)
         public
         onlyOwner
     {
-        erc20tokenAddress[_tokenAddress] = status;
-        emit ERC20TokenUpdated(_tokenAddress, status);
+        erc20tokenAddress[_tokenAddress] = _status;
+        emit ERC20TokenUpdated(_tokenAddress, _status);
     }
 
     /**
@@ -2760,12 +2785,12 @@ contract LimitedCollection is
     /**
      * @notice Allows Admin to add nft address.
      */
-    function adminUpdateERC721FeeToken(address _nftAddress, bool status)
+    function adminUpdateERC721FeeToken(address _nftAddress, bool _status)
         public
         onlyOwner
     {
-        erc721tokenAddress[_nftAddress] = status;
-        emit ERC721TokenUpdated(_nftAddress, status);
+        erc721tokenAddress[_nftAddress] = _status;
+        emit ERC721TokenUpdated(_nftAddress, _status);
     }
 
     /**
@@ -2785,12 +2810,12 @@ contract LimitedCollection is
 
     function updateWhitelist(
         address[] memory _whitelistAddresses,
-        bool[] memory status
+        bool[] memory _status
     ) public onlyOwner {
         require(whiteList == true, "DropsCollection : PUBLIC_COLLECTION");
         for (uint256 i = 0; i < _whitelistAddresses.length; i++) {
-            whiteListedAddress[_whitelistAddresses[i]] = status[i];
-            emit WhiteList(_whitelistAddresses[i], status[i]);
+            whiteListedAddress[_whitelistAddresses[i]] = _status[i];
+            emit WhiteList(_whitelistAddresses[i], _status[i]);
         }
     }
 }
@@ -2841,7 +2866,7 @@ contract LCMaster is Initializable, Ownable {
             "DropMaster : COLLECTION_EXISTS"
         );
 
-        bytes memory bytecode = type(LimitedCollection).creationCode;
+        bytes memory bytecode = type(DropsCollection).creationCode;
         bytes32 salt = keccak256(abi.encodePacked(msg.sender, _colCode));
 
         assembly {

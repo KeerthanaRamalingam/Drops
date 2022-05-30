@@ -2684,7 +2684,7 @@ pragma solidity ^0.7.0;
 /**
  * @title Drop NFTs implemented using the ERC-721 standard.
  */
-contract DropsCollection is
+contract DropsCollectionV1 is
     ERC165Upgradeable,
     ERC721Upgradeable,
     NFT721Creator,
@@ -2797,7 +2797,7 @@ contract DropsCollection is
         address[] memory _whitelistAddresses,
         bool[] memory status
     ) public onlyOwner {
-        require(whiteList == true, "DropsCollection : PUBLIC_COLLECTION");
+        require(whiteList == true, "DropsCollectionV1 : PUBLIC_COLLECTION");
         for (uint256 i = 0; i < _whitelistAddresses.length; i++) {
             whiteListedAddress[_whitelistAddresses[i]] = status[i];
             emit WhiteList(_whitelistAddresses[i], status[i]);
@@ -2851,7 +2851,7 @@ contract LCMasterV1 is Initializable, Ownable {
             "DropMaster : COLLECTION_EXISTS"
         );
 
-        bytes memory bytecode = type(DropsCollection).creationCode;
+        bytes memory bytecode = type(DropsCollectionV1).creationCode;
         bytes32 salt = keccak256(abi.encodePacked(msg.sender, _colCode));
 
         assembly {

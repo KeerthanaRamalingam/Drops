@@ -106,6 +106,81 @@
       "address": "0xa845D77F381e1293De3f649db5791ADFFb7471a7",
       "txHash": "0x0e177657cb6fc3e6e62a9e95c5d7331f397baf68e69c2d55a552046e247c40fc",
       "kind": "transparent"
+    },
+    {
+      "address": "0x62641d90e857213aBed966F503017Bbac94aB3e0",
+      "txHash": "0x1baa2c77a15a448200b59beb207beae9b5ed9f8a12548e130f14971817acadf8",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xA2A89De8A69E12256961905E65A7B2716632413a",
+      "txHash": "0xecaa9c345a4638190cc7035510751b47e0c6a0090e31c227555b64b1f59c5751",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x294366eb296704Da5084932D5be81f301D5f5E56",
+      "txHash": "0x9a39394c421083c5d52bef9ab43d46a3dffa3d9ba1e582677d429a4c3f35bc22",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x26A24488a1559467FaE6F28c1cA2CDc7e9cc790D",
+      "txHash": "0x21fe557ad8f91d9184d160156e0748ce551ceabe035ca22904d863364c563f49",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x21a1B6fE5c798B5B91b90Fe00956043dcB9731D0",
+      "txHash": "0x1351f23365c5e761fdd4b34a9eec7966976642ae77ff522862855475ff4825b5",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xC8cf4faeE2c9650be840585b906497B4470b5032",
+      "txHash": "0x1d6ac9bfba8252fc64da4f51a80781b1916f44665557de9481a935a72e9f6b26",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x32C1c06033174eb6B06fef59fbb3Ea56C00b92C1",
+      "txHash": "0x59b53b0d2bedcc2d36412254fd849e17a0ff56c908993d4b21851d090bc4b5f1",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x929c10E82Aff1302c4197248781E0B642EBe7C76",
+      "txHash": "0x875bc5c3031ea1e6310f4ed77833ecc329cd8439737437c150a2909114e32adb",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xD6a9144A922D5d3Cc50590838b4aF829B172f18a",
+      "txHash": "0xbc4e5cb36e320bb3ea5d5bd0aa7c0177835073f20b3b84fc8179f36a2d85d3d9",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x464ED550D2Db7A39E6BCb27f1c5556A5e3475468",
+      "txHash": "0x432aa26584d4ee11179a34002209c38c66ccb968e1cb5b73095cf0ecb84e909b",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x9f8E78684137E7B6f894E22A79ECFa159E003d35",
+      "txHash": "0x91a9a4a4447bcd7cf84b9e9b3fcb19365355790ee9e8cb9d2eb39259e0336551",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x05E08B9477C4d483211769805a89fF687a73c83F",
+      "txHash": "0x9eda49c18db9fd3f6b4ebf9e2c504ddc64b32b02176c3df1705082f0baaa27eb",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x7976A7e5B04322c74E3952dCb074c017c2ae8ca7",
+      "txHash": "0xe7234f92f2b26eb70bb8bc0895dbb7700070ca0fe52eb80a97245aecd0c427cd",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xfEC37B4997312B91E848D15DeBd014B269f45b08",
+      "txHash": "0x3b06a32c8a9df81f17bcad48f49360f5b74358246edc5c675b6494f8d02dfff7",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x3451a8EE430b551Be7bA446a34CEa1e2f5539002",
+      "txHash": "0xd246a81eb3f0d38c76ccbc62799e1d5c42ea02ebffa2199281f92826d3fa1bf5",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -1244,6 +1319,146 @@
     "f6ee1cb622cb04e86c0a6f09cf6dbc2601d9b1a02b677a97fc5b2684e91ff8da": {
       "address": "0xE7517C08Ef4FBC0b5ec754F4a3E5ED5e4c6D4B02",
       "txHash": "0x59329b2bf295cf0925fd60692c423cdbb12bc5b8622116da0b97bafcbf7a9339",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\LCMasterV1.sol:270"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\LCMasterV1.sol:275"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "contracts\\LCMasterV1.sol:888"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "Ownable",
+            "src": "contracts\\LCMasterV1.sol:908"
+          },
+          {
+            "label": "treasury",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_address_payable",
+            "contract": "LCMasterV1",
+            "src": "contracts\\LCMasterV1.sol:2811"
+          },
+          {
+            "label": "collections",
+            "offset": 0,
+            "slot": "53",
+            "type": "t_mapping(t_address,t_mapping(t_string_memory_ptr,t_struct(collectionInfo)4163_storage))",
+            "contract": "LCMasterV1",
+            "src": "contracts\\LCMasterV1.sol:2829"
+          },
+          {
+            "label": "getCollection",
+            "offset": 0,
+            "slot": "54",
+            "type": "t_mapping(t_address,t_mapping(t_string_memory_ptr,t_address))",
+            "contract": "LCMasterV1",
+            "src": "contracts\\LCMasterV1.sol:2831"
+          },
+          {
+            "label": "getCode",
+            "offset": 0,
+            "slot": "55",
+            "type": "t_mapping(t_address,t_string_storage)",
+            "contract": "LCMasterV1",
+            "src": "contracts\\LCMasterV1.sol:2833"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_address_payable": {
+            "label": "address payable",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_mapping(t_string_memory_ptr,t_address))": {
+            "label": "mapping(address => mapping(string => address))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_string_memory_ptr,t_struct(collectionInfo)4163_storage))": {
+            "label": "mapping(address => mapping(string => struct LCMasterV1.collectionInfo))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_string_storage)": {
+            "label": "mapping(address => string)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_string_memory_ptr,t_address)": {
+            "label": "mapping(string => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_string_memory_ptr,t_struct(collectionInfo)4163_storage)": {
+            "label": "mapping(string => struct LCMasterV1.collectionInfo)",
+            "numberOfBytes": "32"
+          },
+          "t_string_memory_ptr": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(collectionInfo)4163_storage": {
+            "label": "struct LCMasterV1.collectionInfo",
+            "members": [
+              {
+                "label": "symbol",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "newCollection",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        }
+      }
+    },
+    "5bad49f1105e36e4ccd72f4b0a87bc63e1174d0909409f19ebff757b770bc4c9": {
+      "address": "0xd3ff02E49aF04d3094dB280260C7bFbb08206336",
+      "txHash": "0xc25a254f1cb8b185238a1d688a7ce6e74021f37063cd73552c589ee1b1aab6d7",
       "layout": {
         "storage": [
           {

@@ -110,19 +110,19 @@ async function main() {
     const collection = await ethers.getContractFactory('DropsCollection');
     const collectionInstance = await collection.attach(Collection);
 
-    await collectionInstance.initialize(treasuryProxy.address, "Wardrobe Collection", "Wardrobe-101", 20, startTime, endTime, true, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Male", "Female"], ["Wardrobe Collection - NFT ", "https://ipfs.io/ipfs/QmRRJFxfnys7Rf7DCWVwmU29EeArTJjghjn2vSQqoFtQ44/_thumbnail.png", "Casual Wear", "Casual", "prime", "drops", "true", "outfit"]);
-    await new Promise(res => setTimeout(res, 5000));
+    await collectionInstance.initialize(treasuryProxy.address, "Wardrobe Collection", "Wardrobe-101", 20, startTime, endTime, true, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Male","Wardrobe Collection - NFT", "https://ipfs.io/ipfs/QmRRJFxfnys7Rf7DCWVwmU29EeArTJjghjn2vSQqoFtQ44/_thumbnail.png", "Casual Wear", "Casual", "prime", "drops", "true", "outfit"]);
+    await new Promise(res => setTimeout(res, 8000));
 
     //Second Collection
     const collectionInstanceTwo = await collection.attach(CollectionTwo);
 
-    await collectionInstanceTwo.initialize(treasuryProxy.address, "Stance Collection", "Stance-101", 40, 1653625800, 1658896200, false, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Male", "Female"], ["Stance Collection - NFT Movements ", "https://ipfs.io/ipfs/QmboRdoXyCnMtH87FdxWnFyvZRTwxSzwGzeA58XQhQfJx5/_thumbnail.gif", "Basic Movements", "Movements", "other", "drops", "true", "animation"]);
-    await new Promise(res => setTimeout(res, 5000));
+    await collectionInstanceTwo.initialize(treasuryProxy.address, "Stance Collection", "Stance-101", 40, 1654000000, 1658896200, false, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Female","Stance Collection - NFT Movements", "https://ipfs.io/ipfs/QmboRdoXyCnMtH87FdxWnFyvZRTwxSzwGzeA58XQhQfJx5/_thumbnail.gif", "Basic Movements", "Movements", "other", "drops", "true", "animation"]);
+    await new Promise(res => setTimeout(res, 8000));
 
     //Third Collection
     // const collectionInstanceThree =  await collection.attach(CollectionThree);
 
-    // await collectionInstanceThree.initialize(treasuryProxy.address,"Trace Silks – Overall Best NFT Horse Racing Project","103",60, startTime, endTime, false,conversion.address,["Size", "Color", "Gender","Category","Theme","Style"], ["Male", "Female", "Unisex"], ["Players can even purchase plots of land within the Silks metaverse, which are vital to housing and maintaining Silks horses. If a player owns ten contiguous plots of land, they will be able to construct a horse farm and a stable, which provides space for up to ten horses. Finally, since each plot of land is structured as an NFT, landowners benefit from value increases by selling in the secondary market.","https://ipfs.io/ipfs/QmeXRtR4kX9H7m2Ri56nKNEuhxMpZNYjkNAAY47ckPuA6n","Horse-100","Trace Art 2022-100","other","drops","false","outfit"]);
+    //await collectionInstanceThree.initialize(treasuryProxy.address,"Trace Silks – Overall Best NFT Horse Racing Project","103",60, startTime, endTime, false,conversion.address,["Size", "Color", "Gender","Category","Theme","Style"], ["Unisex","Players can even purchase plots of land within the Silks metaverse, which are vital to housing and maintaining Silks horses. If a player owns ten contiguous plots of land, they will be able to construct a horse farm and a stable, which provides space for up to ten horses. Finally, since each plot of land is structured as an NFT, landowners benefit from value increases by selling in the secondary market.","https://ipfs.io/ipfs/QmeXRtR4kX9H7m2Ri56nKNEuhxMpZNYjkNAAY47ckPuA6n","Horse-100","Trace Art 2022-100","other","drops","false","outfit"]);
     // await new Promise(res => setTimeout(res, 5000));
 
     // console.log("Owner", await collectionInstance.owner());
