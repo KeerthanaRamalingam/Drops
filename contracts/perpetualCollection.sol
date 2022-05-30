@@ -2786,7 +2786,7 @@ contract LimitedCollection is
 
 pragma solidity ^0.7.0;
 
-contract LCMasterV1 is Initializable, Ownable {
+contract LCMaster is Initializable, Ownable {
     address payable treasury;
 
     struct collectionInfo {

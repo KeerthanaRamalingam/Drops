@@ -3,7 +3,7 @@ const { ethers } = require("hardhat")
 async function main() {
     const accounts = await ethers.provider.listAccounts();
     console.log("Accounts", accounts[0]);
-    
+
     //Testnet Tokens
     const USDT = "0xF2fE21E854c838C66579f62Ba0a60CA84367cd8F"
     const USDC = "0xb0040280A0C97F20C92c09513b8C6e6Ff9Aa86DC"
@@ -31,7 +31,7 @@ async function main() {
     //  const PRICE_USDT_USD = "0x0A6513e40db6EB1b165753AD52E80663aeA50545";
     //  const PRICE_USDC_USD = "0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7";
 
-    const mintFee = 100000000;
+    const mintFee = 10000;
 
     const dropsTreasury = await ethers.getContractFactory("Treasury");
     const treasuryProxy = await upgrades.deployProxy(dropsTreasury, [accounts[0]], { initializer: 'initialize' })
@@ -56,25 +56,25 @@ async function main() {
     console.log("LimitedCollectionProxy:", LimitedCollectionProxy.address);
 
     //First Collection
-    await LimitedCollectionProxy.createCollection("101");
+    await LimitedCollectionProxy.createCollection("Wardrobe-101");
     await new Promise(res => setTimeout(res, 10000));
 
-    const Collection = await LimitedCollectionProxy.getCollection(accounts[0], "101");
+    const Collection = await LimitedCollectionProxy.getCollection(accounts[0], "Wardrobe-101");
     console.log("First Collection Address", Collection);
 
     //Second Collection
-    await LimitedCollectionProxy.createCollection("102");
+    await LimitedCollectionProxy.createCollection("Stance-101");
     await new Promise(res => setTimeout(res, 10000));
 
-    const CollectionTwo = await LimitedCollectionProxy.getCollection(accounts[0], "102");
+    const CollectionTwo = await LimitedCollectionProxy.getCollection(accounts[0], "Stance-101");
     console.log("Second Collection Address", CollectionTwo);
 
-    //Third Collection
-    await LimitedCollectionProxy.createCollection("103");
-    await new Promise(res => setTimeout(res, 10000));
+    // //Third Collection
+    // await LimitedCollectionProxy.createCollection("103");
+    // await new Promise(res => setTimeout(res, 10000));
 
-    const CollectionThree = await LimitedCollectionProxy.getCollection(accounts[0], "103");
-    console.log("Third Collection Address", CollectionThree);
+    // const CollectionThree = await LimitedCollectionProxy.getCollection(accounts[0], "103");
+    // console.log("Third Collection Address", CollectionThree);
 
 
     /// ************ DEPLOY CONVERSION **************/////
@@ -106,26 +106,26 @@ async function main() {
     await conversion.adminUpdate(USX, Trace, router, factory);
 
 
-     //First Collection
-    const collection = await ethers.getContractFactory('LimitedCollection');
+    //First Collection
+    const collection = await ethers.getContractFactory('DropsCollection');
     const collectionInstance = await collection.attach(Collection);
-    
-    await collectionInstance.initialize(treasuryProxy.address, "Prime Collection ETH mainnet - 02 - Kiddo Monkeys 14919", "101", 20, startTime, endTime, true, conversion.address, ["Size", "Color", "Gender","Category","Theme","Style"], ["Male"], ["NFTs are unique cryptographic tokens that exist on a blockchain and cannot be replica", "https://ipfs.io/ipfs/QmRECTS8gSXLbRgomsrvi7nY6x2SCVPER4f1jSUxWpxaRu/nft.jpg", "Art & Gaming", "Pixel Art 2022", "prime", "drops", "true", "outfit"]);
-    await new Promise(res => setTimeout(res, 20000));
+
+    await collectionInstance.initialize(treasuryProxy.address, "Wardrobe Collection", "Wardrobe-101", 20, startTime, endTime, true, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Male", "Female"], ["Wardrobe Collection - NFT ", "https://ipfs.io/ipfs/QmRRJFxfnys7Rf7DCWVwmU29EeArTJjghjn2vSQqoFtQ44/_thumbnail.png", "Casual Wear", "Casual", "prime", "drops", "true", "outfit"]);
+    await new Promise(res => setTimeout(res, 5000));
 
     //Second Collection
     const collectionInstanceTwo = await collection.attach(CollectionTwo);
 
-    await collectionInstanceTwo.initialize(treasuryProxy.address,"Trace Cryptopunk nft highest sale: nft art finance","102",40, startTime, 0, false, conversion.address, ["Size", "Color", "Gender","Category","Theme","Style"], ["Male", "Female"],["The first drop features a collaboration with top digital artist FVCKRENDER that includes a custom World Pong League digital art piece which will unlock a virtual beer pong game with the the superstar singer-rapper, where millions of worthless copies of the same file exist.","https://ipfs.io/ipfs/QmQXbsaf32Qwo8f6vyubZNhDq9oYPwhapc7pvdzYE5CVM2","Art & Gaming-100","Pixel Art 2022-100","prime","drops","true","outfit"]);
+    await collectionInstanceTwo.initialize(treasuryProxy.address, "Stance Collection", "Stance-101", 40, 1653625800, 1658896200, false, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Male", "Female"], ["Stance Collection - NFT Movements ", "https://ipfs.io/ipfs/QmboRdoXyCnMtH87FdxWnFyvZRTwxSzwGzeA58XQhQfJx5/_thumbnail.gif", "Basic Movements", "Movements", "other", "drops", "true", "animation"]);
     await new Promise(res => setTimeout(res, 5000));
 
     //Third Collection
-    const collectionInstanceThree =  await collection.attach(CollectionThree);
+    // const collectionInstanceThree =  await collection.attach(CollectionThree);
 
-    await collectionInstanceThree.initialize(treasuryProxy.address,"Trace Silks – Overall Best NFT Horse Racing Project","103",60, startTime, endTime, false,conversion.address,["Size", "Color", "Gender","Category","Theme","Style"], ["Male", "Female", "Unisex"], ["Players can even purchase plots of land within the Silks metaverse, which are vital to housing and maintaining Silks horses. If a player owns ten contiguous plots of land, they will be able to construct a horse farm and a stable, which provides space for up to ten horses. Finally, since each plot of land is structured as an NFT, landowners benefit from value increases by selling in the secondary market.","https://ipfs.io/ipfs/QmeXRtR4kX9H7m2Ri56nKNEuhxMpZNYjkNAAY47ckPuA6n","Horse-100","Trace Art 2022-100","other","drops","false","outfit"]);
-    await new Promise(res => setTimeout(res, 5000));
+    // await collectionInstanceThree.initialize(treasuryProxy.address,"Trace Silks – Overall Best NFT Horse Racing Project","103",60, startTime, endTime, false,conversion.address,["Size", "Color", "Gender","Category","Theme","Style"], ["Male", "Female", "Unisex"], ["Players can even purchase plots of land within the Silks metaverse, which are vital to housing and maintaining Silks horses. If a player owns ten contiguous plots of land, they will be able to construct a horse farm and a stable, which provides space for up to ten horses. Finally, since each plot of land is structured as an NFT, landowners benefit from value increases by selling in the secondary market.","https://ipfs.io/ipfs/QmeXRtR4kX9H7m2Ri56nKNEuhxMpZNYjkNAAY47ckPuA6n","Horse-100","Trace Art 2022-100","other","drops","false","outfit"]);
+    // await new Promise(res => setTimeout(res, 5000));
 
-    console.log("Owner", await collectionInstance.owner());
+    // console.log("Owner", await collectionInstance.owner());
 
 
     //// ************ ADD TOKEN TO First Collection **************/////
@@ -148,7 +148,7 @@ async function main() {
     await collectionInstance.adminUpdateERC721FeeToken(NFTToken, true); // USDC
 
     await new Promise(res => setTimeout(res, 10000));
-    console.log("Supported token", await collectionInstance.tokenAddress(MATIC));
+    console.log("Supported token", await collectionInstance.erc20tokenAddress(MATIC));
 
     await collectionInstance.adminUpdateFees(mintFee);
     await new Promise(res => setTimeout(res, 10000));
@@ -161,7 +161,7 @@ async function main() {
     await collectionInstance.updateWhitelist([accounts[0]], [true]);
     await new Promise(res => setTimeout(res, 5000));
 
-    await collectionInstance.adminUpdateBaseURI("https://ipfs.io/ipfs/QmRXAz562Lq9n5mFCF24Jm84y5AYiDbgG4nqaQeMN4A4Jx/");
+    await collectionInstance.adminUpdateBaseURI("https://ipfs.io/ipfs/QmQ69HdwyfyYiox6Gu7k55TExYDNGDD6yvUx3V5Wq5725w/");
     await new Promise(res => setTimeout(res, 5000));
 
     await collectionInstance.adminUpdateDeviation(5);
@@ -171,7 +171,7 @@ async function main() {
     console.log("Price", price);
 
     console.log("Next token ID", await collectionInstance.getNextTokenId());
-    await collectionInstance.mint(MATIC, 0, "ERC20" , "{'Gender': 'F', 'Type': 'XYZ'}", {
+    await collectionInstance.mint(MATIC, 0, "ERC20", "{'Gender': 'M', 'Type': 'XYZ'}", {
         value: price
     });
     await new Promise(res => setTimeout(res, 5000));
@@ -199,7 +199,7 @@ async function main() {
 
 
     await new Promise(res => setTimeout(res, 5000));
-    console.log("Supported token", await collectionInstanceTwo.tokenAddress(MATIC));
+    console.log("Supported token", await collectionInstanceTwo.erc20tokenAddress(MATIC));
 
     await collectionInstanceTwo.adminUpdateFees(mintFee);
     await new Promise(res => setTimeout(res, 5000));
@@ -208,7 +208,7 @@ async function main() {
 
     await new Promise(res => setTimeout(res, 5000));
 
-    await collectionInstanceTwo.adminUpdateBaseURI("https://ipfs.io/ipfs/QmRXAz562Lq9n5mFCF24Jm84y5AYiDbgG4nqaQeMN4A4Jx/");
+    await collectionInstanceTwo.adminUpdateBaseURI("https://ipfs.io/ipfs/QmRzuR4qfps7SvpYrr4ivsqSMHLyyYZ9ejFipxBu5gip8N/");
     await new Promise(res => setTimeout(res, 5000));
 
 
@@ -216,43 +216,56 @@ async function main() {
 
     await collectionInstanceTwo.adminUpdateDeviation(5);
 
+    await new Promise(res => setTimeout(res, 5000));
+
+    var price = await conversion.convertMintFee(MATIC, mintFee);
+    console.log("Price", price);
+
+    console.log("Next token ID", await collectionInstanceTwo.getNextTokenId());
+    await collectionInstanceTwo.mint(MATIC, 0, "ERC20", "{'Gender': 'M', 'Type': 'XYZ'}", {
+        value: price
+    });
+    await new Promise(res => setTimeout(res, 5000));
+
+    console.log("Next token ID", await collectionInstanceTwo.getNextTokenId());
+
     //// ************ ADD TOKEN TO Third Collection **************/////
 
-    await new Promise(res => setTimeout(res, 5000));
-    await collectionInstanceThree.adminUpdateERC20FeeToken(MATIC, true); // Matic
+    // await new Promise(res => setTimeout(res, 5000));
+    // await collectionInstanceThree.adminUpdateERC20FeeToken(MATIC, true); // Matic
 
-    await new Promise(res => setTimeout(res, 5000));
-    await collectionInstanceThree.adminUpdateERC20FeeToken(USDT, true); // USDT
+    // await new Promise(res => setTimeout(res, 5000));
+    // await collectionInstanceThree.adminUpdateERC20FeeToken(USDT, true); // USDT
 
-    await new Promise(res => setTimeout(res, 5000));
-    await collectionInstanceThree.adminUpdateERC20FeeToken(USDC, true); // USDC
+    // await new Promise(res => setTimeout(res, 5000));
+    // await collectionInstanceThree.adminUpdateERC20FeeToken(USDC, true); // USDC
 
-    await new Promise(res => setTimeout(res, 5000));
-    await collectionInstanceThree.adminUpdateERC20FeeToken(Trace, true); // Trace
+    // await new Promise(res => setTimeout(res, 5000));
+    // await collectionInstanceThree.adminUpdateERC20FeeToken(Trace, true); // Trace
 
-    await new Promise(res => setTimeout(res, 5000));
-    await collectionInstanceThree.adminUpdateERC20FeeToken(USX, true); // USX
+    // await new Promise(res => setTimeout(res, 5000));
+    // await collectionInstanceThree.adminUpdateERC20FeeToken(USX, true); // USX
 
-    await collectionInstanceThree.adminUpdateERC721FeeToken(NFTToken, true); // USDC
-
-
-    await new Promise(res => setTimeout(res, 5000));
-    console.log("Supported token", await collectionInstanceThree.tokenAddress(MATIC));
-
-    await collectionInstanceThree.adminUpdateFees(mintFee);
-    await new Promise(res => setTimeout(res, 5000));
-
-    console.log("Mint fee", await collectionInstanceThree.getMintFee());
-
-    await new Promise(res => setTimeout(res, 5000));
-
-    await collectionInstanceThree.adminUpdateBaseURI("https://ipfs.io/ipfs/QmRXAz562Lq9n5mFCF24Jm84y5AYiDbgG4nqaQeMN4A4Jx/");
-    await new Promise(res => setTimeout(res, 5000));
+    // await collectionInstanceThree.adminUpdateERC721FeeToken(NFTToken, true); // USDC
 
 
-    await new Promise(res => setTimeout(res, 5000));
+    // await new Promise(res => setTimeout(res, 5000));
+    // console.log("Supported token", await collectionInstanceThree.tokenAddress(MATIC));
 
-    await collectionInstanceThree.adminUpdateDeviation(5);
+    // await collectionInstanceThree.adminUpdateFees(mintFee);
+    // await new Promise(res => setTimeout(res, 5000));
+
+    // console.log("Mint fee", await collectionInstanceThree.getMintFee());
+
+    // await new Promise(res => setTimeout(res, 5000));
+
+    // await collectionInstanceThree.adminUpdateBaseURI("https://ipfs.io/ipfs/QmRXAz562Lq9n5mFCF24Jm84y5AYiDbgG4nqaQeMN4A4Jx/");
+    // await new Promise(res => setTimeout(res, 5000));
+
+
+    // await new Promise(res => setTimeout(res, 5000));
+
+    // await collectionInstanceThree.adminUpdateDeviation(5);
 
 
 }
