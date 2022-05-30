@@ -2822,7 +2822,7 @@ contract DropsCollection is
 
 pragma solidity ^0.7.0;
 
-contract LCMaster is Initializable, Ownable {
+contract LCMasterFlat is Initializable, Ownable {
     address payable treasury;
 
     struct collectionInfo {

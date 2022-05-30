@@ -48,7 +48,7 @@ async function main() {
     const thirtyDays = 30 * 24 * 60 * 60;
     const endTime = startTime + thirtyDays;
 
-    const LimitedCollection = await ethers.getContractFactory("LCMasterV1")
+    const LimitedCollection = await ethers.getContractFactory("LCMasterFlat")
     const LimitedCollectionProxy = await upgrades.deployProxy(LimitedCollection, { initializer: 'initialize' });
     await new Promise(res => setTimeout(res, 10000));
 
@@ -171,7 +171,7 @@ async function main() {
     console.log("Price", price);
 
     console.log("Next token ID", await collectionInstance.getNextTokenId());
-    await collectionInstance.mint(MATIC, 0, "ERC20", "{'Gender': 'M', 'Type': 'XYZ'}", {
+    await collectionInstance.mint(MATIC, 0, "ERC20", {
         value: price
     });
     await new Promise(res => setTimeout(res, 5000));
@@ -222,7 +222,7 @@ async function main() {
     console.log("Price", price);
 
     console.log("Next token ID", await collectionInstanceTwo.getNextTokenId());
-    await collectionInstanceTwo.mint(MATIC, 0, "ERC20", "{'Gender': 'M', 'Type': 'XYZ'}", {
+    await collectionInstanceTwo.mint(MATIC, 0, "ERC20", {
         value: price
     });
     await new Promise(res => setTimeout(res, 5000));
