@@ -1750,6 +1750,9 @@ contract ERC721Upgradeable is
     // Price Conversion
     address public priceConversion;
 
+    //Buddy Address
+    address public buddyAddress;
+
     // Deviation Percentage
     uint256 public deviationPercentage;
 
@@ -1794,6 +1797,13 @@ contract ERC721Upgradeable is
     bytes4 private constant _INTERFACE_ID_ERC721_ENUMERABLE = 0x780e9d63;
 
     event WhiteList(address whiteListedAddress, bool _status);
+
+    event BuddyAddressUpdated(address indexed buddyContractAddress);
+
+    modifier onlyBuddyContract() {
+        require(msg.sender == buddyAddress,"NFT721Mint: NOT_BUDDY_ADDRESS");
+        _;
+    }
 
     /**
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
@@ -2072,12 +2082,12 @@ contract ERC721Upgradeable is
         _transfer(from, to, tokenId);
     }
 
-    function lock(uint256 tokenId) external {
+    function lock(uint256 tokenId) external onlyBuddyContract { 
         require(_exists(tokenId),"ERC721: operator query for nonexistent token");
         status[tokenId] = true;
     }
 
-    function release(uint256 tokenId) external {
+    function release(uint256 tokenId) external onlyBuddyContract {
         require(_exists(tokenId),"ERC721: operator query for nonexistent token");
         status[tokenId] = false;
     }
@@ -2562,6 +2572,7 @@ abstract contract NFT721Mint is
         _;
     }
 
+
     /**
      * @notice To check the totalSupply.
      */
@@ -2780,6 +2791,14 @@ contract DropsCollection is
     {
         deviationPercentage = _deviationPercentage;
         emit DeviationPercentage(_deviationPercentage);
+    }
+
+    function adminUpdateBuddy(address _buddyAddress)
+        public
+        onlyOwner
+    {
+        buddyAddress = _buddyAddress;
+        emit BuddyAddressUpdated(_buddyAddress);
     }
 
     /**

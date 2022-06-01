@@ -123,7 +123,7 @@ async function main() {
     //Second Collection
     const collectionInstanceTwo = await collection.attach(CollectionTwo);
 
-    await collectionInstanceTwo.initialize(treasuryProxy.address, "Stance Collection", "Stance-101", 40, startTime, endTime, false, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Male","Stance Collection - NFT Movements", "https://ipfs.io/ipfs/QmboRdoXyCnMtH87FdxWnFyvZRTwxSzwGzeA58XQhQfJx5/_thumbnail.gif", "Basic Movements", "Movements", "other", "drops", "true", "animation"]);
+    await collectionInstanceTwo.initialize(treasuryProxy.address, "Stance Collection", "Stance-101", 40, startTime, endTime, false, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Male","Wardrobe Collection - NFT", "https://ipfs.io/ipfs/QmRRJFxfnys7Rf7DCWVwmU29EeArTJjghjn2vSQqoFtQ44/_thumbnail.png", "Casual Wear", "Casual", "prime", "drops", "true", "outfit"]);
     await new Promise(res => setTimeout(res, 8000));
 
     //Third Collection
@@ -295,8 +295,3 @@ main()
         console.error(error)
         process.exit(1)
     })
-
-
-    //Female - stance -  prime(tommorow 7)
-
-    //isWhiteListRequired
