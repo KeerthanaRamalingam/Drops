@@ -2084,11 +2084,13 @@ contract ERC721Upgradeable is
 
     function lock(uint256 tokenId) external onlyBuddyContract { 
         require(_exists(tokenId),"ERC721: operator query for nonexistent token");
+        require(status[tokenId] == false, "ERC721: Token locked already");
         status[tokenId] = true;
     }
 
     function release(uint256 tokenId) external onlyBuddyContract {
         require(_exists(tokenId),"ERC721: operator query for nonexistent token");
+        require(status[tokenId] == true, "ERC721: Token unlocked already");
         status[tokenId] = false;
     }
 
@@ -2501,6 +2503,7 @@ abstract contract NFT721Creator is Initializable, ERC721Upgradeable {
      * @notice Allows the creator to burn if they currently own the NFT.
      */
     function burn(uint256 tokenId) public onlyCreatorAndOwner(tokenId) {
+        require(status[tokenId] == false,"NFT721Creator: Token is locked");
         _burn(tokenId);
     }
 
@@ -2625,7 +2628,7 @@ abstract contract NFT721Mint is
                     IERC721Upgradeable(paymentToken).ownerOf(feeAmount),
                 "NFT721Mint : Caller is not the owner"
             );
-            IERC721Upgradeable(paymentToken).transferFrom(
+            IERC721Upgradeable(paymentToken).safeTransferFrom(
                 msg.sender,
                 getDropsTreasury(),
                 feeAmount
