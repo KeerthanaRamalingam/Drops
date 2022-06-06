@@ -56,31 +56,33 @@ async function main() {
     console.log("LimitedCollectionProxy:", LimitedCollectionProxy.address);
 
     //First Collection
-    await LimitedCollectionProxy.createCollection("Wardrobe-101");
+    await LimitedCollectionProxy.createCollection("MaleWardrobe-101");
     await new Promise(res => setTimeout(res, 10000));
 
-    const Collection = await LimitedCollectionProxy.getCollection(accounts[0], "Wardrobe-101");
+    const Collection = await LimitedCollectionProxy.getCollection(accounts[0], "MaleWardrobe-101");
     console.log("First Collection Address", Collection);
 
     //Second Collection
-    await LimitedCollectionProxy.createCollection("Stance-101");
+    await LimitedCollectionProxy.createCollection("FemaleWardrobe-102");
     await new Promise(res => setTimeout(res, 10000));
 
-    const CollectionTwo = await LimitedCollectionProxy.getCollection(accounts[0], "Stance-101");
-    console.log("Second Collection Address", CollectionTwo);
+    const CollectionTwo = await LimitedCollectionProxy.getCollection(accounts[0], "FemaleWardrobe-102");
+    console.log("Third Collection Address", CollectionTwo);
 
-    // //Third Collection
-     await LimitedCollectionProxy.createCollection("Wardrobe-102");
-     await new Promise(res => setTimeout(res, 10000));
 
-     const CollectionThree = await LimitedCollectionProxy.getCollection(accounts[0], "Wardrobe-102");
-     console.log("Third Collection Address", CollectionThree);
+    //Third Collection
+    await LimitedCollectionProxy.createCollection("MaleStance-103");
+    await new Promise(res => setTimeout(res, 10000));
+
+    const CollectionThree = await LimitedCollectionProxy.getCollection(accounts[0], "MaleStance-103");
+    console.log("Second Collection Address", CollectionThree);
+
 
      //Fourth Collection
-    await LimitedCollectionProxy.createCollection("Stance-102");
+    await LimitedCollectionProxy.createCollection("FemaleStance-104");
     await new Promise(res => setTimeout(res, 12000));
 
-    const CollectionFour = await LimitedCollectionProxy.getCollection(accounts[0], "Stance-102");
+    const CollectionFour = await LimitedCollectionProxy.getCollection(accounts[0], "FemaleStance-104");
     console.log("Fourth Collection Address", CollectionFour);
 
 
@@ -117,29 +119,28 @@ async function main() {
     const collection = await ethers.getContractFactory('DropsCollection');
     const collectionInstance = await collection.attach(Collection);
 
-    await collectionInstance.initialize(treasuryProxy.address, "Wardrobe Collection", "Wardrobe-101", 20, startTime, endTime, true, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Male","Wardrobe Collection - NFT", "https://ipfs.io/ipfs/QmRRJFxfnys7Rf7DCWVwmU29EeArTJjghjn2vSQqoFtQ44/_thumbnail.png", "Casual Wear", "Casual", "prime", "drops", "true", "outfit"]);
+    await collectionInstance.initialize(treasuryProxy.address, "Male Wardrobe Collection", "MaleWardrobe-101", 20, startTime, endTime, false, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Male","Men's clothing essentials: Give your wardrobe a firm foundation with these timeless menswear essentials, from indigo jeans to a navy suit.", "https://ipfs.io/ipfs/QmRRJFxfnys7Rf7DCWVwmU29EeArTJjghjn2vSQqoFtQ44/_thumbnail.png", " Male Casual Wear", "Casual", "prime", "drops", "true", "outfit"]);
     await new Promise(res => setTimeout(res, 8000));
 
     //Second Collection
-    const collectionInstanceTwo = await collection.attach(CollectionTwo);
+    const collectionInstanceTwo =  collection.attach(CollectionTwo);
 
-    await collectionInstanceTwo.initialize(treasuryProxy.address, "Stance Collection", "Stance-101", 40, startTime, endTime, false, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Male","Wardrobe Collection - NFT", "https://ipfs.io/ipfs/QmRRJFxfnys7Rf7DCWVwmU29EeArTJjghjn2vSQqoFtQ44/_thumbnail.png", "Casual Wear", "Casual", "prime", "drops", "true", "outfit"]);
-    await new Promise(res => setTimeout(res, 8000));
-
-    //Third Collection
-     const collectionInstanceThree =  await collection.attach(CollectionThree);
-
-    await collectionInstanceThree.initialize(treasuryProxy.address,"Wardrobe Collection","Wardrobe-102",60, startTime, endTime, false,conversion.address,["Size", "Color", "Gender","Category","Theme","Style"], ["Female","Wardrobe Collection - NFT", "https://ipfs.io/ipfs/QmeXRtR4kX9H7m2Ri56nKNEuhxMpZNYjkNAAY47ckPuA6n","Horse-100","Trace Art 2022-100","other","drops","true","outfit"]);
+    await collectionInstanceTwo.initialize(treasuryProxy.address,"Female Wardrobe Collection","FemaleWardrobe-102",60, startTime, endTime, false,conversion.address,["Size", "Color", "Gender","Category","Theme","Style"], ["Female","Designers make clothes, women make fashion. Choose from a wide range of dress for women's at great style.", "https://ipfs.io/ipfs/QmdGMpYq2rCgZHgfkwtYT9VzVFu5sbiMC3zQhEPRefckMD/_thumbnail.png","Female Casual Wear","Casual","prime","drops","true","outfit"]);
     await new Promise(res => setTimeout(res, 5000));
 
-    //Fourth Collection
-    const collectionInstanceFour = await collection.attach(CollectionFour);
+    //Third Collection
+    const collectionInstanceThree =  collection.attach(CollectionThree);
 
-    await collectionInstanceFour.initialize(treasuryProxy.address, "Stance Collection", "Stance-102", 40, 1654046149, endTime, true, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Female","Stance Collection - NFT Movements", "https://ipfs.io/ipfs/QmboRdoXyCnMtH87FdxWnFyvZRTwxSzwGzeA58XQhQfJx5/_thumbnail.gif", "Basic Movements", "Movements", "prime", "drops", "true", "animation"]);
+    await collectionInstanceThree.initialize(treasuryProxy.address, "Male Stance Collection", "MaleStance-103", 40, startTime, endTime, true, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Male","Choose the style you wanted to be", "https://ipfs.io/ipfs/QmboRdoXyCnMtH87FdxWnFyvZRTwxSzwGzeA58XQhQfJx5/_thumbnail.gif", "Basic Movements", "Movements", "prime", "drops", "true", "animation"]);
     await new Promise(res => setTimeout(res, 8000));
 
 
-   // console.log("Owner", await collectionInstance.owner());
+    //Fourth Collection
+    const collectionInstanceFour = collection.attach(CollectionFour);
+
+    await collectionInstanceFour.initialize(treasuryProxy.address,"Female Stance Collection", "FemaleStance-104", 40, 1654230695, endTime, true, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Female","Choose the style you wanted to be", "https://ipfs.io/ipfs/QmParCKMd1bbwWNRAV3iSoHQJtoJXg5od345zmpPFPkt2C/_thumbnail.gif", "Basic Movements","Movements", "prime", "drops", "true", "animation"]);
+    await new Promise(res => setTimeout(res, 8000));
+
 
 
     //// ************ ADD TOKEN TO First Collection **************/////
@@ -166,9 +167,6 @@ async function main() {
 
     await collectionInstance.adminUpdateFees(mintFee);
 
-    await collectionInstance.updateWhitelist([accounts[0]], [true]);
-    await new Promise(res => setTimeout(res, 5000));
-
     await collectionInstance.adminUpdateBaseURI("https://ipfs.io/ipfs/QmcLKPGBUDneGArGGVaFk4pDPKiVSyz3eBkGn3uuiQuNMN/");
     await new Promise(res => setTimeout(res, 5000));
 
@@ -176,7 +174,7 @@ async function main() {
     await new Promise(res => setTimeout(res, 5000));
 
 
-    console.log("Next token ID", await collectionInstance.getNextTokenId());
+    console.log("FIRST COLLECTION DONE");
 
     //// ************ ADD TOKEN TO Second Collection **************/////
 
@@ -198,59 +196,57 @@ async function main() {
     await collectionInstanceTwo.adminUpdateERC721FeeToken(NFTToken, true); // USDC
 
 
-    await new Promise(res => setTimeout(res, 5000));
-    console.log("Supported token", await collectionInstanceTwo.erc20tokenAddress(MATIC));
+   await new Promise(res => setTimeout(res, 5000));
+   console.log("Supported token", await collectionInstanceTwo.erc20tokenAddress(MATIC));
 
-    await collectionInstanceTwo.adminUpdateFees(mintFee);
-
-    await new Promise(res => setTimeout(res, 5000));
-
-    await collectionInstanceTwo.adminUpdateBaseURI("https://ipfs.io/ipfs/QmdovTq5UHd2ghkZTWScLqmiGEFR1XDusr7SSkpFTYbc52/");
+   await collectionInstanceTwo.adminUpdateFees(mintFee);
     await new Promise(res => setTimeout(res, 5000));
 
-
+    await collectionInstanceTwo.adminUpdateBaseURI("https://ipfs.io/ipfs/QmNtjjWNo3Kt3nXsYDF6M3e5zZryRsj4JvAf4HrSh7Qned/");
     await new Promise(res => setTimeout(res, 5000));
+
 
     await collectionInstanceTwo.adminUpdateDeviation(5);
 
-
-    console.log("Next token ID", await collectionInstanceTwo.getNextTokenId());
-
+    console.log("SECOND COLLECTION DONE");
+ 
 
     //// ************ ADD TOKEN TO Third Collection **************/////
 
-     await new Promise(res => setTimeout(res, 5000));
-     await collectionInstanceThree.adminUpdateERC20FeeToken(MATIC, true); // Matic
 
-     await new Promise(res => setTimeout(res, 5000));
-     await collectionInstanceThree.adminUpdateERC20FeeToken(USDT, true); // USDT
+    await new Promise(res => setTimeout(res, 5000));
+    await collectionInstanceThree.adminUpdateERC20FeeToken(MATIC, true); // Matic
 
-     await new Promise(res => setTimeout(res, 5000));
-     await collectionInstanceThree.adminUpdateERC20FeeToken(USDC, true); // USDC
+    await new Promise(res => setTimeout(res, 5000));
+    await collectionInstanceThree.adminUpdateERC20FeeToken(USDT, true); // USDT
 
-     await new Promise(res => setTimeout(res, 5000));
-     await collectionInstanceThree.adminUpdateERC20FeeToken(Trace, true); // Trace
+    await new Promise(res => setTimeout(res, 5000));
+    await collectionInstanceThree.adminUpdateERC20FeeToken(USDC, true); // USDC
 
-     await new Promise(res => setTimeout(res, 5000));
-     await collectionInstanceThree.adminUpdateERC20FeeToken(USX, true); // USX
+    await new Promise(res => setTimeout(res, 5000));
+    await collectionInstanceThree.adminUpdateERC20FeeToken(Trace, true); // Trace
 
-     await collectionInstanceThree.adminUpdateERC721FeeToken(NFTToken, true); // USDC
+    await new Promise(res => setTimeout(res, 5000));
+    await collectionInstanceThree.adminUpdateERC20FeeToken(USX, true); // USX
+
+    await collectionInstanceThree.adminUpdateERC721FeeToken(NFTToken, true); // USDC
 
 
     await new Promise(res => setTimeout(res, 5000));
     console.log("Supported token", await collectionInstanceThree.erc20tokenAddress(MATIC));
 
     await collectionInstanceThree.adminUpdateFees(mintFee);
-     await new Promise(res => setTimeout(res, 5000));
 
-     await collectionInstanceThree.adminUpdateBaseURI("https://ipfs.io/ipfs/QmNtjjWNo3Kt3nXsYDF6M3e5zZryRsj4JvAf4HrSh7Qned/");
-     await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 5000));
+
+    await collectionInstanceThree.adminUpdateBaseURI("https://ipfs.io/ipfs/QmdovTq5UHd2ghkZTWScLqmiGEFR1XDusr7SSkpFTYbc52/");
+    await new Promise(res => setTimeout(res, 5000));
 
 
-     await new Promise(res => setTimeout(res, 5000));
+    await collectionInstanceThree.adminUpdateDeviation(5);
 
-     await collectionInstanceThree.adminUpdateDeviation(5);
 
+    console.log("THIRD COLLECTION DONE");
 
 
      //// ************ ADD TOKEN TO Fourth Collection **************/////
@@ -282,10 +278,9 @@ async function main() {
      await collectionInstanceFour.adminUpdateBaseURI("https://ipfs.io/ipfs/QmZN5QQqCxJ7NsDm6dVuSzHKP5V4s3VztzygMvE71VQTx5/");
      await new Promise(res => setTimeout(res, 5000));
 
-
-     await new Promise(res => setTimeout(res, 5000));
-
      await collectionInstanceFour.adminUpdateDeviation(5);
+
+     console.log("FOURTH COLLECTION DONE");
 
 }
 
@@ -295,3 +290,14 @@ main()
         console.error(error)
         process.exit(1)
     })
+
+
+/*
+Treasury proxy 0xE29005B2fFEB8FBbA92a859365b600aec78c9cb7
+LimitedCollectionProxy: 0x681fc0F2DcD7046139ab40219F73aa140e52aE07
+First Collection Address 0x3f6b633d188e354eBfe7A5175A4c6b074edaAA44
+Third Collection Address 0x875ca100E54E7999Ce9a04739842b31036Be5D8f
+Second Collection Address 0xA4613dBD3D2819e5fff9e4cF70bbf4199BfD773F
+Fourth Collection Address 0x807f3caC715fbE935e3501CD0Fa51982F36d7390
+conversion proxy 0x4Dc5AF39e3f3558396C290F5C32637AA39632C12
+*/
