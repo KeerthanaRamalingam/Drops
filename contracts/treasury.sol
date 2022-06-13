@@ -1240,4 +1240,4 @@ contract Treasury is
     function initialize(address admin) public initializer {
         AdminRole._initializeAdminRole(admin);
     }
-}    
+}
