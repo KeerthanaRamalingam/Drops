@@ -78,7 +78,7 @@ async function main() {
     console.log("Second Collection Address", CollectionThree);
 
 
-     //Fourth Collection
+    //Fourth Collection
     await LimitedCollectionProxy.createCollection("FemaleStance-104");
     await new Promise(res => setTimeout(res, 12000));
 
@@ -119,26 +119,26 @@ async function main() {
     const collection = await ethers.getContractFactory('DropsCollection');
     const collectionInstance = await collection.attach(Collection);
 
-    await collectionInstance.initialize(treasuryProxy.address, "Male Wardrobe Collection", "MaleWardrobe-101", 20, startTime, endTime, false, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Male","Men's clothing essentials: Give your wardrobe a firm foundation with these timeless menswear essentials, from indigo jeans to a navy suit.", "https://ipfs.io/ipfs/QmRRJFxfnys7Rf7DCWVwmU29EeArTJjghjn2vSQqoFtQ44/_thumbnail.png", " Male Casual Wear", "Casual", "prime", "drops", "true", "outfit"]);
+    await collectionInstance.initialize(treasuryProxy.address, "Male Wardrobe Collection", "MaleWardrobe-101", 20, startTime, endTime, false, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Male", "Men's clothing essentials: Give your wardrobe a firm foundation with these timeless menswear essentials, from indigo jeans to a navy suit.", "https://ipfs.io/ipfs/QmRRJFxfnys7Rf7DCWVwmU29EeArTJjghjn2vSQqoFtQ44/_thumbnail.png", " Male Casual Wear", "Casual", "prime", "drops", "true", "outfit"]);
     await new Promise(res => setTimeout(res, 8000));
 
     //Second Collection
-    const collectionInstanceTwo =  collection.attach(CollectionTwo);
+    const collectionInstanceTwo = collection.attach(CollectionTwo);
 
-    await collectionInstanceTwo.initialize(treasuryProxy.address,"Female Wardrobe Collection","FemaleWardrobe-102",60, startTime, endTime, false,conversion.address,["Size", "Color", "Gender","Category","Theme","Style"], ["Female","Designers make clothes, women make fashion. Choose from a wide range of dress for women's at great style.", "https://ipfs.io/ipfs/QmdGMpYq2rCgZHgfkwtYT9VzVFu5sbiMC3zQhEPRefckMD/_thumbnail.png","Female Casual Wear","Casual","prime","drops","true","outfit"]);
+    await collectionInstanceTwo.initialize(treasuryProxy.address, "Female Wardrobe Collection", "FemaleWardrobe-102", 60, startTime, endTime, false, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Female", "Designers make clothes, women make fashion. Choose from a wide range of dress for women's at great style.", "https://ipfs.io/ipfs/QmdGMpYq2rCgZHgfkwtYT9VzVFu5sbiMC3zQhEPRefckMD/_thumbnail.png", "Female Casual Wear", "Casual", "prime", "drops", "true", "outfit"]);
     await new Promise(res => setTimeout(res, 5000));
 
     //Third Collection
-    const collectionInstanceThree =  collection.attach(CollectionThree);
+    const collectionInstanceThree = collection.attach(CollectionThree);
 
-    await collectionInstanceThree.initialize(treasuryProxy.address, "Male Stance Collection", "MaleStance-103", 40, startTime, endTime, true, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Male","Choose the style you wanted to be", "https://ipfs.io/ipfs/QmboRdoXyCnMtH87FdxWnFyvZRTwxSzwGzeA58XQhQfJx5/_thumbnail.gif", "Basic Movements", "Movements", "prime", "drops", "true", "animation"]);
+    await collectionInstanceThree.initialize(treasuryProxy.address, "Male Stance Collection", "MaleStance-103", 40, startTime, endTime, true, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Male", "Choose the style you wanted to be", "https://ipfs.io/ipfs/QmboRdoXyCnMtH87FdxWnFyvZRTwxSzwGzeA58XQhQfJx5/_thumbnail.gif", "Basic Movements", "Movements", "prime", "drops", "true", "animation"]);
     await new Promise(res => setTimeout(res, 8000));
 
 
     //Fourth Collection
     const collectionInstanceFour = collection.attach(CollectionFour);
 
-    await collectionInstanceFour.initialize(treasuryProxy.address,"Female Stance Collection", "FemaleStance-104", 40, 1654230695, endTime, true, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Female","Choose the style you wanted to be", "https://ipfs.io/ipfs/QmParCKMd1bbwWNRAV3iSoHQJtoJXg5od345zmpPFPkt2C/_thumbnail.gif", "Basic Movements","Movements", "prime", "drops", "true", "animation"]);
+    await collectionInstanceFour.initialize(treasuryProxy.address, "Female Stance Collection", "FemaleStance-104", 40, 1654230695, endTime, true, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Female", "Choose the style you wanted to be", "https://ipfs.io/ipfs/QmParCKMd1bbwWNRAV3iSoHQJtoJXg5od345zmpPFPkt2C/_thumbnail.gif", "Basic Movements", "Movements", "prime", "drops", "true", "animation"]);
     await new Promise(res => setTimeout(res, 8000));
 
 
@@ -196,10 +196,10 @@ async function main() {
     await collectionInstanceTwo.adminUpdateERC721FeeToken(NFTToken, true); // USDC
 
 
-   await new Promise(res => setTimeout(res, 5000));
-   console.log("Supported token", await collectionInstanceTwo.erc20tokenAddress(MATIC));
+    await new Promise(res => setTimeout(res, 5000));
+    console.log("Supported token", await collectionInstanceTwo.erc20tokenAddress(MATIC));
 
-   await collectionInstanceTwo.adminUpdateFees(mintFee);
+    await collectionInstanceTwo.adminUpdateFees(mintFee);
     await new Promise(res => setTimeout(res, 5000));
 
     await collectionInstanceTwo.adminUpdateBaseURI("https://ipfs.io/ipfs/QmNtjjWNo3Kt3nXsYDF6M3e5zZryRsj4JvAf4HrSh7Qned/");
@@ -209,7 +209,7 @@ async function main() {
     await collectionInstanceTwo.adminUpdateDeviation(5);
 
     console.log("SECOND COLLECTION DONE");
- 
+
 
     //// ************ ADD TOKEN TO Third Collection **************/////
 
@@ -249,38 +249,38 @@ async function main() {
     console.log("THIRD COLLECTION DONE");
 
 
-     //// ************ ADD TOKEN TO Fourth Collection **************/////
+    //// ************ ADD TOKEN TO Fourth Collection **************/////
 
-     await new Promise(res => setTimeout(res, 5000));
-     await collectionInstanceFour.adminUpdateERC20FeeToken(MATIC, true); // Matic
+    await new Promise(res => setTimeout(res, 5000));
+    await collectionInstanceFour.adminUpdateERC20FeeToken(MATIC, true); // Matic
 
-     await new Promise(res => setTimeout(res, 5000));
-     await collectionInstanceFour.adminUpdateERC20FeeToken(USDT, true); // USDT
+    await new Promise(res => setTimeout(res, 5000));
+    await collectionInstanceFour.adminUpdateERC20FeeToken(USDT, true); // USDT
 
-     await new Promise(res => setTimeout(res, 5000));
-     await collectionInstanceFour.adminUpdateERC20FeeToken(USDC, true); // USDC
+    await new Promise(res => setTimeout(res, 5000));
+    await collectionInstanceFour.adminUpdateERC20FeeToken(USDC, true); // USDC
 
-     await new Promise(res => setTimeout(res, 5000));
-     await collectionInstanceFour.adminUpdateERC20FeeToken(Trace, true); // Trace
+    await new Promise(res => setTimeout(res, 5000));
+    await collectionInstanceFour.adminUpdateERC20FeeToken(Trace, true); // Trace
 
-     await new Promise(res => setTimeout(res, 5000));
-     await collectionInstanceFour.adminUpdateERC20FeeToken(USX, true); // USX
+    await new Promise(res => setTimeout(res, 5000));
+    await collectionInstanceFour.adminUpdateERC20FeeToken(USX, true); // USX
 
-     await collectionInstanceFour.adminUpdateERC721FeeToken(NFTToken, true); // USDC
+    await collectionInstanceFour.adminUpdateERC721FeeToken(NFTToken, true); // USDC
 
 
     await new Promise(res => setTimeout(res, 5000));
     console.log("Supported token", await collectionInstanceFour.erc20tokenAddress(MATIC));
 
     await collectionInstanceFour.adminUpdateFees(mintFee);
-     await new Promise(res => setTimeout(res, 5000));
+    await new Promise(res => setTimeout(res, 5000));
 
-     await collectionInstanceFour.adminUpdateBaseURI("https://ipfs.io/ipfs/QmZN5QQqCxJ7NsDm6dVuSzHKP5V4s3VztzygMvE71VQTx5/");
-     await new Promise(res => setTimeout(res, 5000));
+    await collectionInstanceFour.adminUpdateBaseURI("https://ipfs.io/ipfs/QmZN5QQqCxJ7NsDm6dVuSzHKP5V4s3VztzygMvE71VQTx5/");
+    await new Promise(res => setTimeout(res, 5000));
 
-     await collectionInstanceFour.adminUpdateDeviation(5);
+    await collectionInstanceFour.adminUpdateDeviation(5);
 
-     console.log("FOURTH COLLECTION DONE");
+    console.log("FOURTH COLLECTION DONE");
 
 }
 
@@ -290,14 +290,3 @@ main()
         console.error(error)
         process.exit(1)
     })
-
-
-/*
-Treasury proxy 0xE29005B2fFEB8FBbA92a859365b600aec78c9cb7
-LimitedCollectionProxy: 0x681fc0F2DcD7046139ab40219F73aa140e52aE07
-First Collection Address 0x3f6b633d188e354eBfe7A5175A4c6b074edaAA44
-Third Collection Address 0x875ca100E54E7999Ce9a04739842b31036Be5D8f
-Second Collection Address 0xA4613dBD3D2819e5fff9e4cF70bbf4199BfD773F
-Fourth Collection Address 0x807f3caC715fbE935e3501CD0Fa51982F36d7390
-conversion proxy 0x4Dc5AF39e3f3558396C290F5C32637AA39632C12
-*/

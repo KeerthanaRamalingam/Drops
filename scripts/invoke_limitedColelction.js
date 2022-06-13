@@ -29,7 +29,7 @@ async function main() {
     const dropsTreasury = await ethers.getContractFactory("Treasury");
     const dropsTreasuryProxy = await dropsTreasury.attach("0x64F2Ae7E4a2Cc454C19B8A9c018A26A416a16cd8");
 
-    await dropsTreasuryProxy.withdrawFunds(accounts[0],"1405665606644653442");
+    await dropsTreasuryProxy.withdrawFunds(accounts[0], "1405665606644653442");
 }
 
 main()

@@ -36,7 +36,7 @@ async function main() {
 
     const collection = await ethers.getContractFactory('DropsCollection');
 
-    const collectionInstanceThree =  await collection.attach("0x19eF2FecD39752972887f63C569F5641bCCeE5d7");
+    const collectionInstanceThree = await collection.attach("0x19eF2FecD39752972887f63C569F5641bCCeE5d7");
 
     // await collectionInstanceThree.initialize("0xdD0C3DB80b4DD3f33de194935ebC669bF8088169", "Background NFTs", "Background-101", 0, "1653874200", 0, false, "0xa845D77F381e1293De3f649db5791ADFFb7471a7", ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Male", "Female", "Unisex"], ["Backgroud NFTs", "https://ipfs.io/ipfs/QmQMnRt9EHG85pEhgdHh5X7s7zMCJt9JrvDLYDRq4biTpQ/background.jpg", "Basic Backgrounds", "Basic", "other", "drops", "false", "background"]);
     // await new Promise(res => setTimeout(res, 5000));
