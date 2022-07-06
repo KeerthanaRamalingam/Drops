@@ -1752,7 +1752,7 @@ contract ERC721Upgradeable is
     bool public whiteList;
 
     //Visibility
-    bool public visible;
+    bool public visible=true;
 
     // Price Conversion
     address public priceConversion;
