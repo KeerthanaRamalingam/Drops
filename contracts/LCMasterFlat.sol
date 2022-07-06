@@ -1,6 +1,10 @@
 /**
+ *Submitted for verification at polygonscan.com on 2022-06-24
+*/
+
+/**
  *Submitted for verification at polygonscan.com on 2022-05-12
- */
+*/
 
 /**
  *Submitted for verification at polygonscan.com on 2022-04-20
@@ -1747,6 +1751,9 @@ contract ERC721Upgradeable is
     //WhiteList
     bool public whiteList;
 
+    //Visibility
+    bool public visible;
+
     // Price Conversion
     address public priceConversion;
 
@@ -1800,8 +1807,12 @@ contract ERC721Upgradeable is
 
     event BuddyAddressUpdated(address indexed buddyContractAddress);
 
+    event Locked(uint256 tokenId, bool status);
+
+    event Released(uint256 tokenId, bool status);
+    
     modifier onlyBuddyContract() {
-        require(msg.sender == buddyAddress, "NFT721Mint: NOT_BUDDY_ADDRESS");
+        require(msg.sender == buddyAddress,"NFT721Mint: NOT_BUDDY_ADDRESS");
         _;
     }
 
@@ -1988,7 +1999,8 @@ contract ERC721Upgradeable is
      */
     function totalSupply() public view override returns (uint256) {
         // _tokenOwners are indexed by tokenIds, so .length() returns the number of tokenIds
-        if (_supply == 0) return _tokenOwners.length();
+         if (_supply == 0) 
+        return _tokenOwners.length();
         return _supply;
     }
 
@@ -2076,31 +2088,29 @@ contract ERC721Upgradeable is
             _isApprovedOrOwner(_msgSender(), tokenId),
             "ERC721: transfer caller is not owner nor approved"
         );
-        require(
-            status[tokenId] == false,
-            "ERC721: Token cannot be transferred"
-        );
+        require(status[tokenId]==false,"ERC721: Token cannot be transferred");
 
         _transfer(from, to, tokenId);
     }
 
-    function lock(uint256 tokenId) external onlyBuddyContract {
-        require(
-            _exists(tokenId),
-            "ERC721: operator query for nonexistent token"
-        );
+    function lock(uint256 tokenId) external onlyBuddyContract returns(bool){ 
+        require(_exists(tokenId),"ERC721: operator query for nonexistent token");
         require(status[tokenId] == false, "ERC721: Token locked already");
         status[tokenId] = true;
+
+        emit Locked(tokenId,true);
+        return true;
     }
 
-    function release(uint256 tokenId) external onlyBuddyContract {
-        require(
-            _exists(tokenId),
-            "ERC721: operator query for nonexistent token"
-        );
+    function release(uint256 tokenId) external onlyBuddyContract returns(bool) {
+        require(_exists(tokenId),"ERC721: operator query for nonexistent token");
         require(status[tokenId] == true, "ERC721: Token unlocked already");
         status[tokenId] = false;
+
+        emit Released(tokenId,false);
+        return true;
     }
+
 
     /**
      * @dev See {IERC721-safeTransferFrom}.
@@ -2127,10 +2137,7 @@ contract ERC721Upgradeable is
             "ERC721: transfer caller is not owner nor approved"
         );
 
-        require(
-            status[tokenId] == false,
-            "ERC721: Token cannot be transferred"
-        );
+        require(status[tokenId]==false,"ERC721: Token cannot be transferred");
         _safeTransfer(from, to, tokenId, _data);
     }
 
@@ -2513,7 +2520,7 @@ abstract contract NFT721Creator is Initializable, ERC721Upgradeable {
      * @notice Allows the creator to burn if they currently own the NFT.
      */
     function burn(uint256 tokenId) public onlyCreatorAndOwner(tokenId) {
-        require(status[tokenId] == false, "NFT721Creator: Token is locked");
+        require(status[tokenId] == false,"NFT721Creator: Token is locked");
         _burn(tokenId);
     }
 
@@ -2577,6 +2584,8 @@ abstract contract NFT721Mint is
 
     event ConversionUpdated(address conversion);
 
+    event Visibility(bool visible);
+
     modifier onlyWhitelistedUsers() {
         require(
             whiteListedAddress[msg.sender] == true || whiteList == false,
@@ -2584,6 +2593,7 @@ abstract contract NFT721Mint is
         );
         _;
     }
+
 
     /**
      * @notice To check the totalSupply.
@@ -2658,15 +2668,16 @@ abstract contract NFT721Mint is
      * @notice To check the date.
      */
     function checkDate() internal view {
-        if (_endDate != 0) {
+        if( _endDate!=0) {
+        require(
+            _startDate <= block.timestamp && block.timestamp <= _endDate,
+            "NFT721Mint : MINTING_ENDED"
+        );
+        }
+        else {
             require(
-                _startDate <= block.timestamp && block.timestamp <= _endDate,
-                "NFT721Mint : MINTING_ENDED"
-            );
-        } else {
-            require(
-                _startDate <= block.timestamp,
-                "NFT721Mint : MINTING_NOT_LIVE"
+            _startDate <= block.timestamp ,
+            "NFT721Mint : MINTING_NOT_LIVE"
             );
         }
     }
@@ -2804,7 +2815,10 @@ contract DropsCollection is
         emit DeviationPercentage(_deviationPercentage);
     }
 
-    function adminUpdateBuddy(address _buddyAddress) public onlyOwner {
+    function adminUpdateBuddy(address _buddyAddress)
+        public
+        onlyOwner
+    {
         buddyAddress = _buddyAddress;
         emit BuddyAddressUpdated(_buddyAddress);
     }
@@ -2829,6 +2843,15 @@ contract DropsCollection is
     {
         priceConversion = _conversionAddress;
         emit ConversionUpdated(_conversionAddress);
+    }
+
+    /**
+     * @notice Allows admin to set the visibility of the collection.
+     */
+
+    function setVisibility(bool _visibility) public onlyOwner {
+        visible = _visibility;
+        emit Visibility(_visibility);
     }
 
     /**
