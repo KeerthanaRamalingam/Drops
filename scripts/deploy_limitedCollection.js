@@ -388,14 +388,12 @@ main()
 
 
     /**
-     *  LimitedCollectionProxy: 0x84d8c3d85674950E24cB08CdC9ac80a83FA73f2E
-        First Collection Address 0x7BFa454d16B3ac407Aa78Bcc69a0F426BB8418fe
-        Third Collection Address 0x54e9d570c46538F6bA0F1b8DD6f532D0E30b62Ac
-        Second Collection Address 0xe193852e540AdFA03A275a5B9A861F2E29d14de0
-        Fourth Collection Address 0x4A79C85Ba3Dc3DD73668c8E17DBf1B5bb5C1647f
-        Fifth Collection Address 0x4b083D452ADbB1eD8F8ce4527be6Fb9469638904
-        Sixth Collection Address 0x6E9fE49f2BCb4f2918a75921e1fA6cE17dCd0596
-     */
+    LimitedCollectionProxy: 0xB069cD9C18f6A890Fc54c0139AefF6bD003a4c6d
+    First Collection Address 0x2dfFf57613B77ddB8f3ee84fb136FE5306E106EF
+    Third Collection Address 0x3ACe84eCD08F5F98603FD663ab2fBFC7c3594492
+    Second Collection Address 0x9d431035DDD7aadd23d1D4BD311AbE6f96FB3534
+    Fourth Collection Address 0xF15eB96BCdef0bd23691B27d3Ff66DA1CDDec897
+    Fifth Collection Address 0xad8821b07354F00aA888bF230d025cDFa8Acc816
+    Sixth Collection Address 0xC364aCbedCE4fDa1B9540F1276Cc2AE8A87eb5eF
+    */
 
-
-//isVisible // true for visible 

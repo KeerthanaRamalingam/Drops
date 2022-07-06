@@ -14,7 +14,7 @@ async function main() {
      const PRICE_USDT_USD = "0x0A6513e40db6EB1b165753AD52E80663aeA50545";
      const PRICE_USDC_USD = "0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7";
 
-     const USX = "";
+     const USX = "0x107065A122F92636a1358A70A0efe0F1A080a7e5";
      const Trace = "0x4287F07CBE6954f9F0DecD91d0705C926d8d03A4";
      const router = "0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff";
      const factory = "0x5757371414417b8C6CAad45bAeF941aBc7d3Ab32";
@@ -53,7 +53,7 @@ async function main() {
     console.log("First Collection Address", Collection);
 
     //Second Collection
-    await LimitedCollectionProxy.createCollection("FemaleWardrobe-102");
+    /*await LimitedCollectionProxy.createCollection("FemaleWardrobe-102");
     await new Promise(res => setTimeout(res, 10000));
 
     const CollectionTwo = await LimitedCollectionProxy.getCollection(accounts[0], "FemaleWardrobe-102");
@@ -73,10 +73,10 @@ async function main() {
     await new Promise(res => setTimeout(res, 12000));
 
     const CollectionFour = await LimitedCollectionProxy.getCollection(accounts[0], "FemaleStance-104");
-    console.log("Fourth Collection Address", CollectionFour);
+    console.log("Fourth Collection Address", CollectionFour);*/
 
 
-    /// ************ DEPLOY CONVERSION **************/////
+    ///  DEPLOY CONVERSION /////
 
     const Conversion = await ethers.getContractFactory("Conversion");
     const conversion = await upgrades.deployProxy(Conversion, { initializer: 'initialize' })
@@ -104,7 +104,6 @@ async function main() {
     await new Promise(res => setTimeout(res, 10000));
     await conversion.adminUpdate(USX, Trace, router, factory);
 
-
     //First Collection
     const collection = await ethers.getContractFactory('DropsCollection');
     const collectionInstance = await collection.attach(Collection);
@@ -113,7 +112,7 @@ async function main() {
     await new Promise(res => setTimeout(res, 8000));
 
     //Second Collection
-    const collectionInstanceTwo = collection.attach(CollectionTwo);
+    /*const collectionInstanceTwo = collection.attach(CollectionTwo);
 
     await collectionInstanceTwo.initialize(treasuryProxy.address, "Female Wardrobe Collection", "FemaleWardrobe-102", 60, startTime, endTime, false, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Female", "Designers make clothes, women make fashion. Choose from a wide range of dress for women's at great style.", "https://ipfs.io/ipfs/QmdGMpYq2rCgZHgfkwtYT9VzVFu5sbiMC3zQhEPRefckMD/_thumbnail.png", "Female Casual Wear", "Casual", "prime", "drops", "true", "outfit"]);
     await new Promise(res => setTimeout(res, 5000));
@@ -129,7 +128,7 @@ async function main() {
     const collectionInstanceFour = collection.attach(CollectionFour);
 
     await collectionInstanceFour.initialize(treasuryProxy.address, "Female Stance Collection", "FemaleStance-104", 40, 1654230695, endTime, true, conversion.address, ["Size", "Color", "Gender", "Category", "Theme", "Style"], ["Female", "Choose the style you wanted to be", "https://ipfs.io/ipfs/QmParCKMd1bbwWNRAV3iSoHQJtoJXg5od345zmpPFPkt2C/_thumbnail.gif", "Basic Movements", "Movements", "prime", "drops", "true", "animation"]);
-    await new Promise(res => setTimeout(res, 8000));
+    await new Promise(res => setTimeout(res, 8000));*/
 
 
 
@@ -163,12 +162,15 @@ async function main() {
     await collectionInstance.adminUpdateDeviation(5);
     await new Promise(res => setTimeout(res, 5000));
 
+    await collectionInstance.adminUpdateBuddy("0x2DCda82fae61f31378B58955C1C65993B319047A");
+    await new Promise(res => setTimeout(res, 5000));
+
 
     console.log("FIRST COLLECTION DONE");
 
-    //// ************ ADD TOKEN TO Second Collection **************/////
+    //// ADD TOKEN TO Second Collection /////
 
-    await new Promise(res => setTimeout(res, 5000));
+    /*await new Promise(res => setTimeout(res, 5000));
     await collectionInstanceTwo.adminUpdateERC20FeeToken(MATIC, true); // Matic
 
     await new Promise(res => setTimeout(res, 5000));
@@ -201,7 +203,7 @@ async function main() {
     console.log("SECOND COLLECTION DONE");
 
 
-    //// ************ ADD TOKEN TO Third Collection **************/////
+    //// ADD TOKEN TO Third Collection /////
 
 
     await new Promise(res => setTimeout(res, 5000));
@@ -239,7 +241,7 @@ async function main() {
     console.log("THIRD COLLECTION DONE");
 
 
-    //// ************ ADD TOKEN TO Fourth Collection **************/////
+    ////  ADD TOKEN TO Fourth Collection /////
 
     await new Promise(res => setTimeout(res, 5000));
     await collectionInstanceFour.adminUpdateERC20FeeToken(MATIC, true); // Matic
@@ -270,7 +272,7 @@ async function main() {
 
     await collectionInstanceFour.adminUpdateDeviation(5);
 
-    console.log("FOURTH COLLECTION DONE");
+    console.log("FOURTH COLLECTION DONE");*/
 
 }
 

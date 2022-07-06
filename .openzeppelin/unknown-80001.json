@@ -376,6 +376,11 @@
       "address": "0x4Dc5AF39e3f3558396C290F5C32637AA39632C12",
       "txHash": "0x34cb9619b19b950a84bcfc5295cb4a95ac85fea98eb95aeebc9f1fe2c7849391",
       "kind": "transparent"
+    },
+    {
+      "address": "0xB069cD9C18f6A890Fc54c0139AefF6bD003a4c6d",
+      "txHash": "0x9fc4c912c3244f8d14e35e2ba74dead39e707e46c95964193076908e5539381e",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -2047,6 +2052,146 @@
             "numberOfBytes": "32"
           },
           "t_struct(collectionInfo)4281_storage": {
+            "label": "struct LCMasterFlat.collectionInfo",
+            "members": [
+              {
+                "label": "symbol",
+                "type": "t_string_storage",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "newCollection",
+                "type": "t_address",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          }
+        }
+      }
+    },
+    "786e9c62110d156684e2d9fed293b5104097e43df37160050c923230bfa21940": {
+      "address": "0x90410bC88A946F88578a7a8C3A7F657c55d1680b",
+      "txHash": "0xf4aa94f5857cfa12b85490c55be0a67a66f01217753888de361fffdcba36cc86",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\LCMasterFlat.sol:274"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "contracts\\LCMasterFlat.sol:279"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "contracts\\LCMasterFlat.sol:892"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "Ownable",
+            "src": "contracts\\LCMasterFlat.sol:912"
+          },
+          {
+            "label": "treasury",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_address_payable",
+            "contract": "LCMasterFlat",
+            "src": "contracts\\LCMasterFlat.sol:2885"
+          },
+          {
+            "label": "collections",
+            "offset": 0,
+            "slot": "53",
+            "type": "t_mapping(t_address,t_mapping(t_string_memory_ptr,t_struct(collectionInfo)4335_storage))",
+            "contract": "LCMasterFlat",
+            "src": "contracts\\LCMasterFlat.sol:2903"
+          },
+          {
+            "label": "getCollection",
+            "offset": 0,
+            "slot": "54",
+            "type": "t_mapping(t_address,t_mapping(t_string_memory_ptr,t_address))",
+            "contract": "LCMasterFlat",
+            "src": "contracts\\LCMasterFlat.sol:2905"
+          },
+          {
+            "label": "getCode",
+            "offset": 0,
+            "slot": "55",
+            "type": "t_mapping(t_address,t_string_storage)",
+            "contract": "LCMasterFlat",
+            "src": "contracts\\LCMasterFlat.sol:2907"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_address_payable": {
+            "label": "address payable",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_mapping(t_address,t_mapping(t_string_memory_ptr,t_address))": {
+            "label": "mapping(address => mapping(string => address))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_string_memory_ptr,t_struct(collectionInfo)4335_storage))": {
+            "label": "mapping(address => mapping(string => struct LCMasterFlat.collectionInfo))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_string_storage)": {
+            "label": "mapping(address => string)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_string_memory_ptr,t_address)": {
+            "label": "mapping(string => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_string_memory_ptr,t_struct(collectionInfo)4335_storage)": {
+            "label": "mapping(string => struct LCMasterFlat.collectionInfo)",
+            "numberOfBytes": "32"
+          },
+          "t_string_memory_ptr": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_string_storage": {
+            "label": "string",
+            "numberOfBytes": "32"
+          },
+          "t_struct(collectionInfo)4335_storage": {
             "label": "struct LCMasterFlat.collectionInfo",
             "members": [
               {

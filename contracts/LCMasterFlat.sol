@@ -215,9 +215,9 @@ library AddressUpgradeable {
     ) internal returns (bytes memory) {
         require(
             address(this).balance >= value,
-            "Address: insufficient balance for call"
+            "Address: Insufficient balance for call"
         );
-        require(isContract(target), "Address: call to non-contract");
+        require(isContract(target), "Address: Call to non-contract");
 
         // solhint-disable-next-line avoid-low-level-calls
         (bool success, bytes memory returndata) = target.call{value: value}(
@@ -284,7 +284,7 @@ abstract contract Initializable {
     modifier initializer() {
         require(
             _initializing || _isConstructor() || !_initialized,
-            "Initializable: contract is already initialized"
+            "Initializable: Contract is already initialized"
         );
 
         bool isTopLevelCall = !_initializing;
@@ -364,7 +364,7 @@ abstract contract ERC165Upgradeable is Initializable, IERC165Upgradeable {
      * - `interfaceId` cannot be the ERC165 invalid interface (`0xffffffff`).
      */
     function _registerInterface(bytes4 interfaceId) internal virtual {
-        require(interfaceId != 0xffffffff, "ERC165: invalid interface id");
+        require(interfaceId != 0xffffffff, "ERC165: Invalid interface id");
         _supportedInterfaces[interfaceId] = true;
     }
 
@@ -2021,11 +2021,11 @@ contract ERC721Upgradeable is
      */
     function approve(address to, uint256 tokenId) public virtual override {
         address owner = ownerOf(tokenId);
-        require(to != owner, "ERC721: approval to current owner");
+        require(to != owner, "ERC721: Approval to current owner");
 
         require(
             _msgSender() == owner || isApprovedForAll(owner, _msgSender()),
-            "ERC721: approve caller is not owner nor approved for all"
+            "ERC721: Approve caller is not owner nor approved for all"
         );
 
         _approve(to, tokenId);
@@ -2042,7 +2042,7 @@ contract ERC721Upgradeable is
     {
         require(
             _exists(tokenId),
-            "ERC721: approved query for nonexistent token"
+            "ERC721: Approved query for nonexistent token"
         );
 
         return _tokenApprovals[tokenId];
@@ -2056,7 +2056,7 @@ contract ERC721Upgradeable is
         virtual
         override
     {
-        require(operator != _msgSender(), "ERC721: approve to caller");
+        require(operator != _msgSender(), "ERC721: Approve to caller");
 
         _operatorApprovals[_msgSender()][operator] = approved;
         emit ApprovalForAll(_msgSender(), operator, approved);
@@ -2085,7 +2085,7 @@ contract ERC721Upgradeable is
         //solhint-disable-next-line max-line-length
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),
-            "ERC721: transfer caller is not owner nor approved"
+            "ERC721: Transfer caller is not owner nor approved"
         );
         require(
             status[tokenId] == false,
@@ -2098,7 +2098,7 @@ contract ERC721Upgradeable is
     function lock(uint256 tokenId) external onlyBuddyContract returns (bool) {
         require(
             _exists(tokenId),
-            "ERC721: operator query for nonexistent token"
+            "ERC721: Operator query for nonexistent token"
         );
         require(status[tokenId] == false, "ERC721: Token locked already");
         status[tokenId] = true;
@@ -2114,7 +2114,7 @@ contract ERC721Upgradeable is
     {
         require(
             _exists(tokenId),
-            "ERC721: operator query for nonexistent token"
+            "ERC721: Operator query for nonexistent token"
         );
         require(status[tokenId] == true, "ERC721: Token unlocked already");
         status[tokenId] = false;
@@ -2145,7 +2145,7 @@ contract ERC721Upgradeable is
     ) public virtual override {
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),
-            "ERC721: transfer caller is not owner nor approved"
+            "ERC721: Transfer caller is not owner nor approved"
         );
 
         require(
@@ -2182,7 +2182,7 @@ contract ERC721Upgradeable is
         _transfer(from, to, tokenId);
         require(
             _checkOnERC721Received(from, to, tokenId, _data),
-            "ERC721: transfer to non ERC721Receiver implementer"
+            "ERC721: Transfer to non ERC721Receiver implementer"
         );
     }
 
@@ -2212,7 +2212,7 @@ contract ERC721Upgradeable is
     {
         require(
             _exists(tokenId),
-            "ERC721: operator query for nonexistent token"
+            "ERC721: Operator query for nonexistent token"
         );
         address owner = ownerOf(tokenId);
         return (spender == owner ||
@@ -2246,7 +2246,7 @@ contract ERC721Upgradeable is
         _mint(to, tokenId);
         require(
             _checkOnERC721Received(address(0), to, tokenId, _data),
-            "ERC721: transfer to non ERC721Receiver implementer"
+            "ERC721: Transfer to non ERC721Receiver implementer"
         );
     }
 
@@ -2263,8 +2263,8 @@ contract ERC721Upgradeable is
      * Emits a {Transfer} event.
      */
     function _mint(address to, uint256 tokenId) internal virtual {
-        require(to != address(0), "ERC721: mint to the zero address");
-        require(!_exists(tokenId), "ERC721: token already minted");
+        require(to != address(0), "ERC721: Mint to the zero address");
+        require(!_exists(tokenId), "ERC721: Token already minted");
 
         _beforeTokenTransfer(address(0), to, tokenId);
 
@@ -2324,9 +2324,9 @@ contract ERC721Upgradeable is
     ) internal virtual {
         require(
             ownerOf(tokenId) == from,
-            "ERC721: transfer of token that is not own"
+            "ERC721: Transfer of token that is not own"
         );
-        require(to != address(0), "ERC721: transfer to the zero address");
+        require(to != address(0), "ERC721: Transfer to the zero address");
 
         _beforeTokenTransfer(from, to, tokenId);
 
@@ -2603,7 +2603,7 @@ abstract contract NFT721Mint is
     modifier onlyWhitelistedUsers() {
         require(
             whiteListedAddress[msg.sender] == true || whiteList == false,
-            "NFT721Mint : USER_ADDRESS_NOT_WHITELISTED"
+            "NFT721Mint : User address not whitelisted"
         );
         _;
     }
@@ -2613,7 +2613,7 @@ abstract contract NFT721Mint is
      */
     function checkSupply(uint256 tokenId) internal view {
         if (_supply != 0) {
-            require(tokenId <= _supply, "NFT721Mint : SUPPLY_LIMIT_REACHED");
+            require(tokenId <= _supply, "NFT721Mint : Supply limit reached");
         }
     }
 
@@ -2648,7 +2648,7 @@ abstract contract NFT721Mint is
             } else {
                 checkDeviation(msg.value, price);
                 (bool success, ) = treasury_.call{value: msg.value}("");
-                require(success, "Transfer failed.");
+                require(success, "NFT721Mint: Transfer failed.");
             }
         } else {
             require(
@@ -2673,7 +2673,7 @@ abstract contract NFT721Mint is
             feeAmount >= price.sub((price.mul(deviationPercentage)).div(100)) &&
                 feeAmount <=
                 price.add((price.mul(deviationPercentage)).div(100)),
-            "Amount not within deviation percentage"
+            "NFT721Mint: Amount not within deviation percentage"
         );
     }
 
@@ -2684,12 +2684,12 @@ abstract contract NFT721Mint is
         if (_endDate != 0) {
             require(
                 _startDate <= block.timestamp && block.timestamp <= _endDate,
-                "NFT721Mint : MINTING_ENDED"
+                "NFT721Mint : Minting ended"
             );
         } else {
             require(
                 _startDate <= block.timestamp,
-                "NFT721Mint : MINTING_NOT_LIVE"
+                "NFT721Mint : Minting not live"
             );
         }
     }
@@ -2871,7 +2871,7 @@ contract DropsCollection is
         address[] memory _whitelistAddresses,
         bool[] memory _status
     ) public onlyOwner {
-        require(whiteList == true, "DropsCollection : PUBLIC_COLLECTION");
+        require(whiteList == true, "DropsCollection : Public collection");
         for (uint256 i = 0; i < _whitelistAddresses.length; i++) {
             whiteListedAddress[_whitelistAddresses[i]] = _status[i];
             emit WhiteList(_whitelistAddresses[i], _status[i]);
@@ -2922,7 +2922,7 @@ contract LCMasterFlat is Initializable, Ownable {
     {
         require(
             getCollection[msg.sender][_colCode] == address(0),
-            "DropMaster : COLLECTION_EXISTS"
+            "DropMaster : Collection exists"
         );
 
         bytes memory bytecode = type(DropsCollection).creationCode;
@@ -2932,7 +2932,7 @@ contract LCMasterFlat is Initializable, Ownable {
             collection := create2(0, add(bytecode, 32), mload(bytecode), salt)
         }
 
-        require(collection != address(0), "Collection creation ?");
+        require(collection != address(0), "DropMaster: Collection creation ?");
 
         getCollection[msg.sender][_colCode] = collection;
         getCode[collection] = _colCode;
