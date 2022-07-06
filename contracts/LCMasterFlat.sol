@@ -1,15 +1,3 @@
-/**
- *Submitted for verification at polygonscan.com on 2022-06-24
- */
-
-/**
- *Submitted for verification at polygonscan.com on 2022-05-12
- */
-
-/**
- *Submitted for verification at polygonscan.com on 2022-04-20
- */
-
 // SPDX-License-Identifier: UNLICENSED
 // File: contracts/Collection.sol
 
@@ -215,9 +203,9 @@ library AddressUpgradeable {
     ) internal returns (bytes memory) {
         require(
             address(this).balance >= value,
-            "Address: Insufficient balance for call"
+            "Address: insufficient balance for call"
         );
-        require(isContract(target), "Address: Call to non-contract");
+        require(isContract(target), "Address: call to non-contract");
 
         // solhint-disable-next-line avoid-low-level-calls
         (bool success, bytes memory returndata) = target.call{value: value}(
@@ -284,7 +272,7 @@ abstract contract Initializable {
     modifier initializer() {
         require(
             _initializing || _isConstructor() || !_initialized,
-            "Initializable: Contract is already initialized"
+            "Initializable: contract is already initialized"
         );
 
         bool isTopLevelCall = !_initializing;
@@ -364,7 +352,7 @@ abstract contract ERC165Upgradeable is Initializable, IERC165Upgradeable {
      * - `interfaceId` cannot be the ERC165 invalid interface (`0xffffffff`).
      */
     function _registerInterface(bytes4 interfaceId) internal virtual {
-        require(interfaceId != 0xffffffff, "ERC165: Invalid interface id");
+        require(interfaceId != 0xffffffff, "ERC165: invalid interface id");
         _supportedInterfaces[interfaceId] = true;
     }
 
@@ -1841,9 +1829,17 @@ contract ERC721Upgradeable is
         collectionAttributes = attributes_;
     }
 
+    /**
+     * @dev Initializes the supply of the collection.
+     */
+
     function _updateSupply(uint256 supply_) internal {
         _supply = supply_;
     }
+
+    /**
+     * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
+     */
 
     function __ERC721_init_unchained(string memory name_, string memory symbol_)
         internal
@@ -1857,6 +1853,10 @@ contract ERC721Upgradeable is
         _registerInterface(_INTERFACE_ID_ERC721_METADATA);
         _registerInterface(_INTERFACE_ID_ERC721_ENUMERABLE);
     }
+
+    /**
+     * @dev Set the time of the collection.
+     */
 
     function _setTime(uint256 startDate_, uint256 endDate_) internal {
         _startDate = startDate_;
@@ -2095,6 +2095,10 @@ contract ERC721Upgradeable is
         _transfer(from, to, tokenId);
     }
 
+    /**
+     * @dev Sets the lock status of token.
+     */
+
     function lock(uint256 tokenId) external onlyBuddyContract returns (bool) {
         require(
             _exists(tokenId),
@@ -2106,6 +2110,10 @@ contract ERC721Upgradeable is
         emit Locked(tokenId, true);
         return true;
     }
+
+    /**
+     * @dev Sets the release status of token.
+     */
 
     function release(uint256 tokenId)
         external
@@ -2437,7 +2445,7 @@ pragma solidity ^0.7.0;
 /**
  * @notice A mixin that stores a reference to the Drops treasury contract.
  */
-abstract contract TreasuryNode is Initializable {
+abstract contract TreasuryNode is Ownable {
     using AddressUpgradeable for address payable;
 
     address payable private treasury;
@@ -2445,10 +2453,7 @@ abstract contract TreasuryNode is Initializable {
     /**
      * @dev Called once after the initial deployment to set the Drops treasury address.
      */
-    function _initializeTreasuryNode(address payable _treasury)
-        internal
-        initializer
-    {
+    function updateTreasuryNode(address payable _treasury) external onlyOwner {
         require(
             _treasury.isContract(),
             "TreasuryNode: Address is not a contract"
@@ -2598,6 +2603,8 @@ abstract contract NFT721Mint is
 
     event ConversionUpdated(address conversion);
 
+    event TreasuryUpdated(address treasury);
+
     event Visibility(bool visible);
 
     modifier onlyWhitelistedUsers() {
@@ -2667,6 +2674,10 @@ abstract contract NFT721Mint is
             );
         }
     }
+
+    /**
+     * @notice To check amount is within deviation percentage.
+     */
 
     function checkDeviation(uint256 feeAmount, uint256 price) public view {
         require(
@@ -2750,16 +2761,13 @@ contract DropsCollection is
     ERC721Upgradeable,
     NFT721Creator,
     NFT721Metadata,
-    TreasuryNode,
-    NFT721Mint,
-    Ownable
+    NFT721Mint
 {
     /**
      * @notice Called once to configure the contract after the initial deployment.
      * @dev This farms the initialize call out to inherited contracts as needed.
      */
     function initialize(
-        address payable treasury,
         string memory name,
         string memory symbol,
         uint256 supply,
@@ -2773,7 +2781,6 @@ contract DropsCollection is
         Ownable.ownable_init();
         NFT721Creator._initializeNFT721Creator();
         NFT721Mint._initializeNFT721Mint();
-        TreasuryNode._initializeTreasuryNode(treasury);
         ERC721Upgradeable.__ERC721_init(
             name,
             symbol,
@@ -2881,14 +2888,12 @@ contract DropsCollection is
 
 pragma solidity ^0.7.0;
 
-contract LCMasterFlat is Initializable, Ownable {
-    address payable treasury;
-
+contract DropsMaster is Initializable, Ownable {
     struct collectionInfo {
         // the collection symbol
         string symbol;
-        // the contract address
-        address newCollection;
+        // the collectionContract address
+        address collectionContract;
     }
 
     /**
@@ -2909,7 +2914,7 @@ contract LCMasterFlat is Initializable, Ownable {
     event CollectionCreated(
         address creator,
         string colCode,
-        address newCollection
+        address collectionContract
     );
 
     /**
@@ -2939,7 +2944,7 @@ contract LCMasterFlat is Initializable, Ownable {
 
         collections[msg.sender][_colCode] = collectionInfo({
             symbol: _colCode,
-            newCollection: collection
+            collectionContract: collection
         });
 
         emit CollectionCreated(msg.sender, _colCode, collection);
