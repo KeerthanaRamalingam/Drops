@@ -2453,7 +2453,7 @@ abstract contract TreasuryNode is Ownable {
     /**
      * @dev Called once after the initial deployment to set the Drops treasury address.
      */
-    function updateTreasuryNode(address payable _treasury) external onlyOwner {
+    function adminUpdateTreasury(address payable _treasury) external onlyOwner {
         require(
             _treasury.isContract(),
             "TreasuryNode: Address is not a contract"
@@ -2834,6 +2834,9 @@ contract DropsCollection is
         emit DeviationPercentage(_deviationPercentage);
     }
 
+    /**
+     * @notice Allows Admin to update buddy contract address.
+     */
     function adminUpdateBuddy(address _buddyAddress) public onlyOwner {
         buddyAddress = _buddyAddress;
         emit BuddyAddressUpdated(_buddyAddress);
